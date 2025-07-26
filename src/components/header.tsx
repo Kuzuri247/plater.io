@@ -13,6 +13,9 @@ export function Header() {
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
+          <a href="/meme-editor" className="text-muted-foreground hover:text-foreground transition-smooth">
+            Meme Editor
+          </a>
           <a href="#features" className="text-muted-foreground hover:text-foreground transition-smooth">
             Features
           </a>

@@ -74,23 +74,7 @@ const fontWeights = [
   { value: '900', label: 'Black' },
 ];
 
-const textColors = [
-  '#ffffff',
-  '#000000',
-  '#ff0000',
-  '#00ff00',
-  '#0000ff',
-  '#ffff00',
-  '#ff00ff',
-  '#00ffff',
-  '#ffa500',
-  '#800080',
-  '#ffc0cb',
-  '#90ee90',
-  '#87ceeb',
-  '#dda0dd',
-  '#f0e68c',
-];
+const textColors = ['#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff'];
 
 const shadowPresets = [
   { name: 'None', value: 'none' },
@@ -110,7 +94,7 @@ export default function StyleTextEditor() {
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
   const [textElements, setTextElements] = useState<TextElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
-  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 560 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -217,126 +201,12 @@ export default function StyleTextEditor() {
   };
 
   return (
-    <div className="min-h-screen dark:bg-neutral-900 bg-neutral-100 text-black dark:text-white">
+    <div className="min-h-screen dark:bg-neutral-900 bg-neutral-100 text-black dark:text-white font-inter">
       <Header />
 
       <div className="pt-20 px-4">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Left Sidebar - Image Upload & Canvas Controls */}
-            <div className="lg:col-span-1 space-y-4">
-              <Card className="p-4 dark:bg-neutral-900 bg-neutral-100 border-neutral-300 dark:border-neutral-700">
-                <h3 className="dark:text-white text-black font-semibold mb-4">
-                  Background Image
-                </h3>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  variant="outline"
-                  className="w-full border-neutral-300 dark:border-neutral-600"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload Image
-                </Button>
-
-                <div className="mt-4">
-                  <Label className="dark:text-white text-black text-sm">
-                    Canvas Size
-                  </Label>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    <Input
-                      type="number"
-                      value={canvasSize.width}
-                      onChange={(e) =>
-                        setCanvasSize((prev) => ({
-                          ...prev,
-                          width: parseInt(e.target.value) || 800,
-                        }))
-                      }
-                      className="border-neutral-300 dark:border-neutral-600"
-                    />
-                    <Input
-                      type="number"
-                      value={canvasSize.height}
-                      onChange={(e) =>
-                        setCanvasSize((prev) => ({
-                          ...prev,
-                          height: parseInt(e.target.value) || 600,
-                        }))
-                      }
-                      className="border-neutral-300 dark:border-neutral-600"
-                    />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-4 dark:bg-neutral-900 bg-neutral-100 border-neutral-300 dark:border-neutral-700">
-                <Button
-                  onClick={downloadImage}
-                  variant="outline"
-                  className="w-full border-neutral-300 dark:border-neutral-600"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Image
-                </Button>
-              </Card>
-            </div>
-
-            {/* Center - Canvas */}
-            <div className="lg:col-span-2">
-              <Card className="p-4 dark:bg-neutral-900 bg-neutral-100 border-neutral-200 dark:border-neutral-700">
-                <div
-                  ref={canvasRef}
-                  className="relative border-2 border-white/30 rounded-lg overflow-hidden mx-auto"
-                  style={{
-                    width: canvasSize.width,
-                    height: canvasSize.height,
-                    maxWidth: '100%',
-                    backgroundImage: backgroundImage
-                      ? `url(${backgroundImage})`
-                      : undefined,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundColor: backgroundImage ? undefined : '#f0f0f0',
-                  }}
-                  onMouseMove={handleCanvasMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}
-                >
-                  {textElements.map((element) => (
-                    <div
-                      key={element.id}
-                      className={`absolute cursor-move select-none ${
-                        selectedElement === element.id
-                          ? 'ring-2 ring-primary'
-                          : ''
-                      }`}
-                      style={{
-                        left: element.position.x,
-                        top: element.position.y,
-                        fontSize: element.style.fontSize,
-                        fontFamily: element.style.fontFamily,
-                        fontWeight: element.style.fontWeight,
-                        color: element.style.color,
-                        textShadow: element.style.textShadow,
-                        textAlign: element.style.textAlign,
-                      }}
-                      onMouseDown={(e) => handleElementMouseDown(e, element.id)}
-                    >
-                      {element.content}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-
-            {/* Right Sidebar - Text Styling */}
             <div className="lg:col-span-1 space-y-4">
               <Card className="p-4 dark:bg-neutral-900 bg-neutral-100 border-neutral-200 dark:border-neutral-700">
                 <h3 className="dark:text-white text-black font-semibold mb-4 flex items-center gap-2">
@@ -346,9 +216,6 @@ export default function StyleTextEditor() {
 
                 {/* Text Content */}
                 <div className="mb-4">
-                  <Label className="dark:text-white/80 text-black/80 text-sm">
-                    Text Content
-                  </Label>
                   <Textarea
                     value={selectedElementData?.content || currentText}
                     onChange={(e) => {
@@ -361,7 +228,6 @@ export default function StyleTextEditor() {
                     }}
                     className="mt-2 border-neutral-300 dark:border-neutral-600"
                     placeholder="Enter your text..."
-                    rows={3}
                   />
                 </div>
 
@@ -556,46 +422,222 @@ export default function StyleTextEditor() {
                 </div>
 
                 {/* Text Shadow */}
-                <div className="mb-4">
-                  <Label className="dark:text-white/80 text-black/80 text-sm flex items-center gap-2">
-                    <Sparkles className="w-4 h-4" />
-                    Text Shadow
-                  </Label>
-                  <Select
-                    value={selectedElementData?.style.textShadow || textShadow}
-                    onValueChange={(value) => {
-                      if (selectedElementData) {
-                        updateSelectedElement({
-                          style: {
-                            ...selectedElementData.style,
-                            textShadow: value,
-                          },
-                        });
-                      } else {
-                        setTextShadow(value);
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="mt-2 border-neutral-300 dark:border-neutral-600">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {shadowPresets.map((shadow) => (
-                        <SelectItem key={shadow.name} value={shadow.value}>
-                          {shadow.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              </Card>
+            </div>
 
-                <Button
-                  onClick={addTextElement}
-                  className="w-full"
-                  variant="default"
+            {/* Center - Canvas */}
+            <div className="lg:col-span-2">
+              <Card className="p-4 dark:bg-neutral-900 bg-neutral-100 border-neutral-200 dark:border-neutral-700">
+                <div
+                  ref={canvasRef}
+                  className="relative border-2 border-white/30 rounded-lg overflow-hidden mx-auto"
+                  style={{
+                    width: canvasSize.width,
+                    height: canvasSize.height,
+                    maxWidth: '100%',
+                    backgroundImage: backgroundImage
+                      ? `url(${backgroundImage})`
+                      : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundColor: backgroundImage ? undefined : '#f0f0f0',
+                  }}
+                  onMouseMove={handleCanvasMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
                 >
-                  Add Text to Canvas
-                </Button>
+                  {textElements.map((element) => (
+                    <div
+                      key={element.id}
+                      className={`absolute cursor-move select-none ${
+                        selectedElement === element.id
+                          ? 'ring-2 ring-primary'
+                          : ''
+                      }`}
+                      style={{
+                        left: element.position.x,
+                        top: element.position.y,
+                        fontSize: element.style.fontSize,
+                        fontFamily: element.style.fontFamily,
+                        fontWeight: element.style.fontWeight,
+                        color: element.style.color,
+                        textShadow: element.style.textShadow,
+                        textAlign: element.style.textAlign,
+                      }}
+                      onMouseDown={(e) => handleElementMouseDown(e, element.id)}
+                    >
+                      {element.content}
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+
+            <div className="lg:col-span-1 space-y-4">
+              <Card className="p-4 dark:bg-neutral-900 bg-neutral-100 border-neutral-300 dark:border-neutral-700">
+              <div className="mb-4">
+                <Label className="dark:text-white/80 text-black/80 text-sm flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                Text Shadow
+                </Label>
+                <Select
+                value={selectedElementData?.style.textShadow || textShadow}
+                onValueChange={(value) => {
+                  if (selectedElementData) {
+                  updateSelectedElement({
+                    style: {
+                    ...selectedElementData.style,
+                    textShadow: value,
+                    },
+                  });
+                  } else {
+                  setTextShadow(value);
+                  }
+                }}
+                >
+                <SelectTrigger className="mt-2 w-full border-neutral-300 dark:border-neutral-600">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {shadowPresets.map((shadow) => (
+                  <SelectItem 
+                    key={shadow.name} 
+                    value={shadow.value}
+                    className="font-normal"
+                  >
+                    {shadow.name}
+                  </SelectItem>
+                  ))}
+                </SelectContent>
+                </Select>
+              </div>
+
+              <Button
+                onClick={addTextElement}
+                className="w-full mb-6"
+                variant="default"
+              >
+                Add Text to Canvas
+              </Button>
+
+              <Label className="dark:text-white/80 text-black/80 text-sm block mb-2">
+                Background Image
+              </Label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                variant="outline"
+                className="w-full border-neutral-300 dark:border-neutral-600"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Image
+              </Button>
+
+
+                <div className="mt-4">
+                  <Label className="dark:text-white text-black text-sm">
+                    Canvas Size
+                  </Label>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <Input
+                      type="number"
+                      value={canvasSize.width}
+                      onChange={(e) =>
+                        setCanvasSize((prev) => ({
+                          ...prev,
+                          width: parseInt(e.target.value) || 800,
+                        }))
+                      }
+                      className="border-neutral-300 dark:border-neutral-600"
+                    />
+                    <Input
+                      type="number"
+                      value={canvasSize.height}
+                      onChange={(e) =>
+                        setCanvasSize((prev) => ({
+                          ...prev,
+                          height: parseInt(e.target.value) || 600,
+                        }))
+                      }
+                      className="border-neutral-300 dark:border-neutral-600"
+                    />
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-4 dark:bg-neutral-900 bg-neutral-100 border-neutral-300 dark:border-neutral-700">
+                <>
+                  <h3 className="dark:text-white text-black font-semibold mb-4">
+                    Export
+                  </h3>
+                  <Button
+                    onClick={() => {
+                      if (!canvasRef.current) return;
+
+                      // Create a temporary canvas
+                      const canvas = document.createElement('canvas');
+                      const ctx = canvas.getContext('2d');
+                      if (!ctx) return;
+
+                      // Set canvas size
+                      canvas.width = canvasSize.width;
+                      canvas.height = canvasSize.height;
+
+                      // Draw background if exists
+                      if (backgroundImage) {
+                        const img = new Image();
+                        img.src = backgroundImage;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                      } else {
+                        ctx.fillStyle = '#f0f0f0';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                      }
+
+                      // Draw text elements
+                      textElements.forEach((element) => {
+                        ctx.font = `${element.style.fontWeight} ${element.style.fontSize}px ${element.style.fontFamily}`;
+                        ctx.fillStyle = element.style.color;
+                        ctx.textAlign = element.style.textAlign;
+                        ctx.textBaseline = 'top';
+
+                        // Apply text shadow
+                        if (element.style.textShadow !== 'none') {
+                          ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                          ctx.shadowBlur = 4;
+                          ctx.shadowOffsetX = 2;
+                          ctx.shadowOffsetY = 2;
+                        }
+
+                        // Calculate x position based on text alignment
+                        let x = element.position.x;
+                        if (element.style.textAlign === 'center') x += 100;
+                        if (element.style.textAlign === 'right') x += 200;
+
+                        ctx.fillText(element.content, x, element.position.y);
+
+                        // Reset shadow
+                        ctx.shadowColor = 'transparent';
+                      });
+
+                      // Create download link
+                      const link = document.createElement('a');
+                      link.download = 'styled-text.png';
+                      link.href = canvas.toDataURL('image/png');
+                      link.click();
+                    }}
+                    variant="outline"
+                    className="w-full border-neutral-300 dark:border-neutral-600"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Image
+                  </Button>
+                </>
               </Card>
             </div>
           </div>

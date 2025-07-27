@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { Header } from '@/components/header';
 import { MemeCanvas } from '@/components/meme-editor/MemeCanvas';
 import { ImageUploader } from '@/components/meme-editor/ImageUploader';
-import { TextEditor } from '@/components/meme-editor/TextEditor';
 import { GridControls } from '@/components/meme-editor/GridControls';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Download, Save, Undo, Redo } from 'lucide-react';
+import { Download, Undo, Redo } from 'lucide-react';
 
 export interface MemeElement {
   id: string;
@@ -150,8 +149,8 @@ export default function MemeEditor() {
                     variant="outline"
                     className="w-full border-neutral-300 dark:border-neutral-600 dark:text-white text-black hover:bg-neutral-200 dark:hover:bg-neutral-800"
                   >
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Template
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
                   </Button>
                 </div>
               </Card>

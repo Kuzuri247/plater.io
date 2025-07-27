@@ -1,13 +1,28 @@
-import { useState, useRef } from "react";
-import { Header } from "@/components/header";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Textarea } from "@/components/ui/textarea";
-import { Upload, Download, Type, Palette, Sparkles, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
+import { useState, useRef } from 'react';
+import { Header } from '@/components/header';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Upload,
+  Download,
+  Type,
+  Palette,
+  Sparkles,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+} from 'lucide-react';
 
 interface TextStyle {
   fontSize: number;
@@ -26,37 +41,69 @@ interface TextElement {
 }
 
 const fontFamilies = [
-  "Arial", "Helvetica", "Times New Roman", "Georgia", "Verdana", 
-  "Comic Sans MS", "Impact", "Trebuchet MS", "Arial Black", "Courier New",
-  "Roboto", "Open Sans", "Lato", "Montserrat", "Poppins", "Oswald",
-  "Source Sans Pro", "Raleway", "Ubuntu", "Nunito", "Playfair Display"
+  'Arial',
+  'Helvetica',
+  'Times New Roman',
+  'Georgia',
+  'Verdana',
+  'Comic Sans MS',
+  'Impact',
+  'Trebuchet MS',
+  'Arial Black',
+  'Courier New',
+  'Roboto',
+  'Open Sans',
+  'Lato',
+  'Montserrat',
+  'Poppins',
+  'Oswald',
+  'Source Sans Pro',
+  'Raleway',
+  'Ubuntu',
+  'Nunito',
+  'Playfair Display',
 ];
 
 const fontWeights = [
-  { value: "normal", label: "Normal" },
-  { value: "bold", label: "Bold" },
-  { value: "100", label: "Thin" },
-  { value: "300", label: "Light" },
-  { value: "500", label: "Medium" },
-  { value: "700", label: "Bold" },
-  { value: "900", label: "Black" }
+  { value: 'normal', label: 'Normal' },
+  { value: 'bold', label: 'Bold' },
+  { value: '100', label: 'Thin' },
+  { value: '300', label: 'Light' },
+  { value: '500', label: 'Medium' },
+  { value: '700', label: 'Bold' },
+  { value: '900', label: 'Black' },
 ];
 
 const textColors = [
-  "#ffffff", "#000000", "#ff0000", "#00ff00", "#0000ff", 
-  "#ffff00", "#ff00ff", "#00ffff", "#ffa500", "#800080",
-  "#ffc0cb", "#90ee90", "#87ceeb", "#dda0dd", "#f0e68c"
+  '#ffffff',
+  '#000000',
+  '#ff0000',
+  '#00ff00',
+  '#0000ff',
+  '#ffff00',
+  '#ff00ff',
+  '#00ffff',
+  '#ffa500',
+  '#800080',
+  '#ffc0cb',
+  '#90ee90',
+  '#87ceeb',
+  '#dda0dd',
+  '#f0e68c',
 ];
 
 const shadowPresets = [
-  { name: "None", value: "none" },
-  { name: "Light", value: "1px 1px 2px rgba(0,0,0,0.5)" },
-  { name: "Medium", value: "2px 2px 4px rgba(0,0,0,0.8)" },
-  { name: "Heavy", value: "3px 3px 6px rgba(0,0,0,0.9)" },
-  { name: "Glow White", value: "0 0 10px rgba(255,255,255,0.8)" },
-  { name: "Glow Color", value: "0 0 15px rgba(255,0,255,0.8)" },
-  { name: "Outline", value: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" },
-  { name: "3D Effect", value: "2px 2px 0px #000, 4px 4px 0px rgba(0,0,0,0.5)" }
+  { name: 'None', value: 'none' },
+  { name: 'Light', value: '1px 1px 2px rgba(0,0,0,0.5)' },
+  { name: 'Medium', value: '2px 2px 4px rgba(0,0,0,0.8)' },
+  { name: 'Heavy', value: '3px 3px 6px rgba(0,0,0,0.9)' },
+  { name: 'Glow White', value: '0 0 10px rgba(255,255,255,0.8)' },
+  { name: 'Glow Color', value: '0 0 15px rgba(255,0,255,0.8)' },
+  {
+    name: 'Outline',
+    value: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+  },
+  { name: '3D Effect', value: '2px 2px 0px #000, 4px 4px 0px rgba(0,0,0,0.5)' },
 ];
 
 export default function StyleTextEditor() {
@@ -70,13 +117,15 @@ export default function StyleTextEditor() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Current text style state
-  const [currentText, setCurrentText] = useState("Sample Text");
+  const [currentText, setCurrentText] = useState('Sample Text');
   const [fontSize, setFontSize] = useState(32);
-  const [fontFamily, setFontFamily] = useState("Arial");
-  const [fontWeight, setFontWeight] = useState("bold");
-  const [color, setColor] = useState("#ffffff");
-  const [textShadow, setTextShadow] = useState("2px 2px 4px rgba(0,0,0,0.8)");
-  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>("center");
+  const [fontFamily, setFontFamily] = useState('Arial');
+  const [fontWeight, setFontWeight] = useState('bold');
+  const [color, setColor] = useState('#ffffff');
+  const [textShadow, setTextShadow] = useState('2px 2px 4px rgba(0,0,0,0.8)');
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>(
+    'center'
+  );
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -92,16 +141,19 @@ export default function StyleTextEditor() {
   const addTextElement = () => {
     const newElement: TextElement = {
       id: `text_${Date.now()}`,
-      content: currentText || "New Text",
-      position: { x: canvasSize.width / 2 - 100, y: canvasSize.height / 2 - 25 },
+      content: currentText || 'New Text',
+      position: {
+        x: canvasSize.width / 2 - 100,
+        y: canvasSize.height / 2 - 25,
+      },
       style: {
         fontSize,
         fontFamily,
         fontWeight,
         color,
         textShadow,
-        textAlign
-      }
+        textAlign,
+      },
     };
     setTextElements([...textElements, newElement]);
     setSelectedElement(newElement.id);
@@ -109,8 +161,8 @@ export default function StyleTextEditor() {
 
   const updateSelectedElement = (updates: Partial<TextElement>) => {
     if (!selectedElement) return;
-    setTextElements(elements =>
-      elements.map(el =>
+    setTextElements((elements) =>
+      elements.map((el) =>
         el.id === selectedElement ? { ...el, ...updates } : el
       )
     );
@@ -118,13 +170,13 @@ export default function StyleTextEditor() {
 
   const handleElementMouseDown = (e: React.MouseEvent, elementId: string) => {
     e.preventDefault();
-    const element = textElements.find(el => el.id === elementId);
+    const element = textElements.find((el) => el.id === elementId);
     if (!element) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
     setDragOffset({
       x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      y: e.clientY - rect.top,
     });
     setIsDragging(true);
     setSelectedElement(elementId);
@@ -136,11 +188,17 @@ export default function StyleTextEditor() {
     const canvasRect = canvasRef.current.getBoundingClientRect();
     const newPosition = {
       x: e.clientX - canvasRect.left - dragOffset.x,
-      y: e.clientY - canvasRect.top - dragOffset.y
+      y: e.clientY - canvasRect.top - dragOffset.y,
     };
 
-    newPosition.x = Math.max(0, Math.min(newPosition.x, canvasSize.width - 200));
-    newPosition.y = Math.max(0, Math.min(newPosition.y, canvasSize.height - 50));
+    newPosition.x = Math.max(
+      0,
+      Math.min(newPosition.x, canvasSize.width - 200)
+    );
+    newPosition.y = Math.max(
+      0,
+      Math.min(newPosition.y, canvasSize.height - 50)
+    );
 
     updateSelectedElement({ position: newPosition });
   };
@@ -149,25 +207,28 @@ export default function StyleTextEditor() {
     setIsDragging(false);
   };
 
-  const selectedElementData = textElements.find(el => el.id === selectedElement);
+  const selectedElementData = textElements.find(
+    (el) => el.id === selectedElement
+  );
 
   const downloadImage = () => {
     // Implementation for downloading the styled text image
-    console.log("Download functionality to be implemented");
+    console.log('Download functionality to be implemented');
   };
 
   return (
     <div className="min-h-screen dark:bg-neutral-900 bg-neutral-100 text-black dark:text-white">
       <Header />
-      
+
       <div className="pt-20 px-4">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            
             {/* Left Sidebar - Image Upload & Canvas Controls */}
             <div className="lg:col-span-1 space-y-4">
               <Card className="p-4 dark:bg-neutral-900 bg-neutral-100 border-neutral-300 dark:border-neutral-700">
-                <h3 className="dark:text-white text-black font-semibold mb-4">Background Image</h3>
+                <h3 className="dark:text-white text-black font-semibold mb-4">
+                  Background Image
+                </h3>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -183,20 +244,32 @@ export default function StyleTextEditor() {
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Image
                 </Button>
-                
+
                 <div className="mt-4">
-                  <Label className="dark:text-white text-black text-sm">Canvas Size</Label>
+                  <Label className="dark:text-white text-black text-sm">
+                    Canvas Size
+                  </Label>
                   <div className="grid grid-cols-2 gap-2 mt-2">
                     <Input
                       type="number"
                       value={canvasSize.width}
-                      onChange={(e) => setCanvasSize(prev => ({ ...prev, width: parseInt(e.target.value) || 800 }))}
+                      onChange={(e) =>
+                        setCanvasSize((prev) => ({
+                          ...prev,
+                          width: parseInt(e.target.value) || 800,
+                        }))
+                      }
                       className="border-neutral-300 dark:border-neutral-600"
                     />
                     <Input
                       type="number"
                       value={canvasSize.height}
-                      onChange={(e) => setCanvasSize(prev => ({ ...prev, height: parseInt(e.target.value) || 600 }))}
+                      onChange={(e) =>
+                        setCanvasSize((prev) => ({
+                          ...prev,
+                          height: parseInt(e.target.value) || 600,
+                        }))
+                      }
                       className="border-neutral-300 dark:border-neutral-600"
                     />
                   </div>
@@ -225,10 +298,12 @@ export default function StyleTextEditor() {
                     width: canvasSize.width,
                     height: canvasSize.height,
                     maxWidth: '100%',
-                    backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
+                    backgroundImage: backgroundImage
+                      ? `url(${backgroundImage})`
+                      : undefined,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    backgroundColor: backgroundImage ? undefined : '#f0f0f0'
+                    backgroundColor: backgroundImage ? undefined : '#f0f0f0',
                   }}
                   onMouseMove={handleCanvasMouseMove}
                   onMouseUp={handleMouseUp}
@@ -238,7 +313,9 @@ export default function StyleTextEditor() {
                     <div
                       key={element.id}
                       className={`absolute cursor-move select-none ${
-                        selectedElement === element.id ? 'ring-2 ring-primary' : ''
+                        selectedElement === element.id
+                          ? 'ring-2 ring-primary'
+                          : ''
                       }`}
                       style={{
                         left: element.position.x,
@@ -248,7 +325,7 @@ export default function StyleTextEditor() {
                         fontWeight: element.style.fontWeight,
                         color: element.style.color,
                         textShadow: element.style.textShadow,
-                        textAlign: element.style.textAlign
+                        textAlign: element.style.textAlign,
                       }}
                       onMouseDown={(e) => handleElementMouseDown(e, element.id)}
                     >
@@ -269,7 +346,9 @@ export default function StyleTextEditor() {
 
                 {/* Text Content */}
                 <div className="mb-4">
-                  <Label className="dark:text-white/80 text-black/80 text-sm">Text Content</Label>
+                  <Label className="dark:text-white/80 text-black/80 text-sm">
+                    Text Content
+                  </Label>
                   <Textarea
                     value={selectedElementData?.content || currentText}
                     onChange={(e) => {
@@ -288,12 +367,19 @@ export default function StyleTextEditor() {
 
                 {/* Font Family */}
                 <div className="mb-4">
-                  <Label className="dark:text-white/80 text-black/80 text-sm">Font Family</Label>
-                  <Select 
-                    value={selectedElementData?.style.fontFamily || fontFamily} 
+                  <Label className="dark:text-white/80 text-black/80 text-sm">
+                    Font Family
+                  </Label>
+                  <Select
+                    value={selectedElementData?.style.fontFamily || fontFamily}
                     onValueChange={(value) => {
                       if (selectedElementData) {
-                        updateSelectedElement({ style: { ...selectedElementData.style, fontFamily: value } });
+                        updateSelectedElement({
+                          style: {
+                            ...selectedElementData.style,
+                            fontFamily: value,
+                          },
+                        });
                       } else {
                         setFontFamily(value);
                       }
@@ -304,7 +390,11 @@ export default function StyleTextEditor() {
                     </SelectTrigger>
                     <SelectContent>
                       {fontFamilies.map((font) => (
-                        <SelectItem key={font} value={font} style={{ fontFamily: font }}>
+                        <SelectItem
+                          key={font}
+                          value={font}
+                          style={{ fontFamily: font }}
+                        >
                           {font}
                         </SelectItem>
                       ))}
@@ -315,13 +405,19 @@ export default function StyleTextEditor() {
                 {/* Font Size */}
                 <div className="mb-4">
                   <Label className="dark:text-white/80 text-black/80 text-sm">
-                    Font Size: {selectedElementData?.style.fontSize || fontSize}px
+                    Font Size: {selectedElementData?.style.fontSize || fontSize}
+                    px
                   </Label>
                   <Slider
                     value={[selectedElementData?.style.fontSize || fontSize]}
                     onValueChange={([value]) => {
                       if (selectedElementData) {
-                        updateSelectedElement({ style: { ...selectedElementData.style, fontSize: value } });
+                        updateSelectedElement({
+                          style: {
+                            ...selectedElementData.style,
+                            fontSize: value,
+                          },
+                        });
                       } else {
                         setFontSize(value);
                       }
@@ -335,12 +431,19 @@ export default function StyleTextEditor() {
 
                 {/* Font Weight */}
                 <div className="mb-4">
-                  <Label className="dark:text-white/80 text-black/80 text-sm">Font Weight</Label>
-                  <Select 
-                    value={selectedElementData?.style.fontWeight || fontWeight} 
+                  <Label className="dark:text-white/80 text-black/80 text-sm">
+                    Font Weight
+                  </Label>
+                  <Select
+                    value={selectedElementData?.style.fontWeight || fontWeight}
                     onValueChange={(value) => {
                       if (selectedElementData) {
-                        updateSelectedElement({ style: { ...selectedElementData.style, fontWeight: value } });
+                        updateSelectedElement({
+                          style: {
+                            ...selectedElementData.style,
+                            fontWeight: value,
+                          },
+                        });
                       } else {
                         setFontWeight(value);
                       }
@@ -361,22 +464,28 @@ export default function StyleTextEditor() {
 
                 {/* Text Alignment */}
                 <div className="mb-4">
-                  <Label className="dark:text-white/80 text-black/80 text-sm">Text Alignment</Label>
+                  <Label className="dark:text-white/80 text-black/80 text-sm">
+                    Text Alignment
+                  </Label>
                   <div className="flex gap-2 mt-2">
                     {['left', 'center', 'right'].map((align) => (
                       <Button
                         key={align}
                         variant={
-                          (selectedElementData?.style.textAlign || textAlign) === align 
-                            ? 'default' 
+                          (selectedElementData?.style.textAlign ||
+                            textAlign) === align
+                            ? 'default'
                             : 'outline'
                         }
                         size="sm"
                         className="border-neutral-300 dark:border-neutral-600"
                         onClick={() => {
                           if (selectedElementData) {
-                            updateSelectedElement({ 
-                              style: { ...selectedElementData.style, textAlign: align as 'left' | 'center' | 'right' } 
+                            updateSelectedElement({
+                              style: {
+                                ...selectedElementData.style,
+                                textAlign: align as 'left' | 'center' | 'right',
+                              },
                             });
                           } else {
                             setTextAlign(align as 'left' | 'center' | 'right');
@@ -384,8 +493,12 @@ export default function StyleTextEditor() {
                         }}
                       >
                         {align === 'left' && <AlignLeft className="w-4 h-4" />}
-                        {align === 'center' && <AlignCenter className="w-4 h-4" />}
-                        {align === 'right' && <AlignRight className="w-4 h-4" />}
+                        {align === 'center' && (
+                          <AlignCenter className="w-4 h-4" />
+                        )}
+                        {align === 'right' && (
+                          <AlignRight className="w-4 h-4" />
+                        )}
                       </Button>
                     ))}
                   </div>
@@ -402,14 +515,20 @@ export default function StyleTextEditor() {
                       <button
                         key={colorOption}
                         className={`w-8 h-8 rounded border-2 ${
-                          (selectedElementData?.style.color || color) === colorOption 
-                            ? 'border-primary' 
+                          (selectedElementData?.style.color || color) ===
+                          colorOption
+                            ? 'border-primary'
                             : 'border-neutral-300 dark:border-neutral-600'
                         }`}
                         style={{ backgroundColor: colorOption }}
                         onClick={() => {
                           if (selectedElementData) {
-                            updateSelectedElement({ style: { ...selectedElementData.style, color: colorOption } });
+                            updateSelectedElement({
+                              style: {
+                                ...selectedElementData.style,
+                                color: colorOption,
+                              },
+                            });
                           } else {
                             setColor(colorOption);
                           }
@@ -422,7 +541,12 @@ export default function StyleTextEditor() {
                     value={selectedElementData?.style.color || color}
                     onChange={(e) => {
                       if (selectedElementData) {
-                        updateSelectedElement({ style: { ...selectedElementData.style, color: e.target.value } });
+                        updateSelectedElement({
+                          style: {
+                            ...selectedElementData.style,
+                            color: e.target.value,
+                          },
+                        });
                       } else {
                         setColor(e.target.value);
                       }
@@ -437,11 +561,16 @@ export default function StyleTextEditor() {
                     <Sparkles className="w-4 h-4" />
                     Text Shadow
                   </Label>
-                  <Select 
-                    value={selectedElementData?.style.textShadow || textShadow} 
+                  <Select
+                    value={selectedElementData?.style.textShadow || textShadow}
                     onValueChange={(value) => {
                       if (selectedElementData) {
-                        updateSelectedElement({ style: { ...selectedElementData.style, textShadow: value } });
+                        updateSelectedElement({
+                          style: {
+                            ...selectedElementData.style,
+                            textShadow: value,
+                          },
+                        });
                       } else {
                         setTextShadow(value);
                       }

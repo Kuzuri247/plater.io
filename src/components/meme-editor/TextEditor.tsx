@@ -1,67 +1,108 @@
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
-import { Trash2, Type, Palette, Sparkles, AlignLeft, AlignCenter, AlignRight } from "lucide-react"
-import { MemeElement } from "@/pages/MemeEditor"
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import {
+  Trash2,
+  Type,
+  Palette,
+  Sparkles,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+} from 'lucide-react';
+import { MemeElement } from '@/pages/MemeEditor';
 
 interface TextEditorProps {
-  element?: MemeElement
-  onUpdate: (updates: Partial<MemeElement>) => void
-  onDelete: () => void
+  element?: MemeElement;
+  onUpdate: (updates: Partial<MemeElement>) => void;
+  onDelete: () => void;
 }
 
 const fontFamilies = [
-  "Arial", "Helvetica", "Times New Roman", "Georgia", "Verdana", 
-  "Comic Sans MS", "Impact", "Trebuchet MS", "Arial Black", "Courier New"
-]
+  'Arial',
+  'Helvetica',
+  'Times New Roman',
+  'Georgia',
+  'Verdana',
+  'Comic Sans MS',
+  'Impact',
+  'Trebuchet MS',
+  'Arial Black',
+  'Courier New',
+];
 
 const fontWeights = [
-  { value: "normal", label: "Normal" },
-  { value: "bold", label: "Bold" },
-  { value: "100", label: "Thin" },
-  { value: "300", label: "Light" },
-  { value: "500", label: "Medium" },
-  { value: "700", label: "Bold" },
-  { value: "900", label: "Black" }
-]
+  { value: 'normal', label: 'Normal' },
+  { value: 'bold', label: 'Bold' },
+  { value: '100', label: 'Thin' },
+  { value: '300', label: 'Light' },
+  { value: '500', label: 'Medium' },
+  { value: '700', label: 'Bold' },
+  { value: '900', label: 'Black' },
+];
 
 const textColors = [
-  "#ffffff", "#000000", "#ff0000", "#00ff00", "#0000ff", 
-  "#ffff00", "#ff00ff", "#00ffff", "#orange", "#purple"
-]
+  '#ffffff',
+  '#000000',
+  '#ff0000',
+  '#00ff00',
+  '#0000ff',
+  '#ffff00',
+  '#ff00ff',
+  '#00ffff',
+  '#orange',
+  '#purple',
+];
 
 const shadowPresets = [
-  { name: "None", value: "none" },
-  { name: "Light", value: "1px 1px 2px rgba(0,0,0,0.5)" },
-  { name: "Medium", value: "2px 2px 4px rgba(0,0,0,0.8)" },
-  { name: "Heavy", value: "3px 3px 6px rgba(0,0,0,0.9)" },
-  { name: "Glow", value: "0 0 10px rgba(255,255,255,0.8)" },
-  { name: "Outline", value: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }
-]
+  { name: 'None', value: 'none' },
+  { name: 'Light', value: '1px 1px 2px rgba(0,0,0,0.5)' },
+  { name: 'Medium', value: '2px 2px 4px rgba(0,0,0,0.8)' },
+  { name: 'Heavy', value: '3px 3px 6px rgba(0,0,0,0.9)' },
+  { name: 'Glow', value: '0 0 10px rgba(255,255,255,0.8)' },
+  {
+    name: 'Outline',
+    value: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+  },
+];
 
 export function TextEditor({ element, onUpdate, onDelete }: TextEditorProps) {
-  const [text, setText] = useState(element?.content || "")
-  const [fontSize, setFontSize] = useState(element?.style?.fontSize || 24)
-  const [fontFamily, setFontFamily] = useState(element?.style?.fontFamily || "Arial")
-  const [fontWeight, setFontWeight] = useState(element?.style?.fontWeight || "bold")
-  const [color, setColor] = useState(element?.style?.color || "#ffffff")
-  const [textShadow, setTextShadow] = useState(element?.style?.textShadow || "2px 2px 4px rgba(0,0,0,0.8)")
-  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>(element?.style?.textAlign || "center")
+  const [text, setText] = useState(element?.content || '');
+  const [fontSize, setFontSize] = useState(element?.style?.fontSize || 24);
+  const [fontFamily, setFontFamily] = useState(
+    element?.style?.fontFamily || 'Arial'
+  );
+  const [fontWeight, setFontWeight] = useState(
+    element?.style?.fontWeight || 'bold'
+  );
+  const [color, setColor] = useState(element?.style?.color || '#ffffff');
+  const [textShadow, setTextShadow] = useState(
+    element?.style?.textShadow || '2px 2px 4px rgba(0,0,0,0.8)'
+  );
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>(
+    element?.style?.textAlign || 'center'
+  );
 
   useEffect(() => {
     if (element) {
-      setText(element.content)
-      setFontSize(element.style?.fontSize || 24)
-      setFontFamily(element.style?.fontFamily || "Arial")
-      setFontWeight(element.style?.fontWeight || "bold")
-      setColor(element.style?.color || "#ffffff")
-      setTextShadow(element.style?.textShadow || "2px 2px 4px rgba(0,0,0,0.8)")
-      setTextAlign(element.style?.textAlign || "center")
+      setText(element.content);
+      setFontSize(element.style?.fontSize || 24);
+      setFontFamily(element.style?.fontFamily || 'Arial');
+      setFontWeight(element.style?.fontWeight || 'bold');
+      setColor(element.style?.color || '#ffffff');
+      setTextShadow(element.style?.textShadow || '2px 2px 4px rgba(0,0,0,0.8)');
+      setTextAlign(element.style?.textAlign || 'center');
     }
-  }, [element])
+  }, [element]);
 
   const handleUpdate = () => {
     onUpdate({
@@ -72,21 +113,21 @@ export function TextEditor({ element, onUpdate, onDelete }: TextEditorProps) {
         fontWeight,
         color,
         textShadow,
-        textAlign
-      }
-    })
-  }
+        textAlign,
+      },
+    });
+  };
 
   useEffect(() => {
-    handleUpdate()
-  }, [fontSize, fontFamily, fontWeight, color, textShadow, textAlign])
+    handleUpdate();
+  }, [fontSize, fontFamily, fontWeight, color, textShadow, textAlign]);
 
   if (!element || element.type !== 'text') {
     return (
       <div className="text-white/60 text-center py-4">
         Select a text element to edit
       </div>
-    )
+    );
   }
 
   return (
@@ -253,12 +294,12 @@ export function TextEditor({ element, onUpdate, onDelete }: TextEditorProps) {
             fontWeight: fontWeight,
             color: color,
             textShadow: textShadow,
-            textAlign: textAlign
+            textAlign: textAlign,
           }}
         >
-          {text || "Sample Text"}
+          {text || 'Sample Text'}
         </div>
       </div>
     </div>
-  )
+  );
 }

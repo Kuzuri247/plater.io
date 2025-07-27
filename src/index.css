@@ -37,14 +37,27 @@ All colors MUST be HSL.
     --ring: 262 83% 58%;
 
     /* Creative gradients inspired by InboxWarden */
-    --gradient-primary: linear-gradient(135deg, hsl(262, 85%, 48%), hsl(316 60% 68%));
-    --gradient-hero: linear-gradient(0deg, hsl(262 53% 58%) 0%, hsl(316 50% 68%) 0%, hsl(45 53% 87%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100% / 0.1), hsl(262 83% 58% / 0.05));
-    
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(262, 85%, 48%),
+      hsl(316 60% 68%)
+    );
+    --gradient-hero: linear-gradient(
+      0deg,
+      hsl(262 53% 58%) 0%,
+      hsl(316 50% 68%) 0%,
+      hsl(45 53% 87%) 100%
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(0 0% 100% / 0.1),
+      hsl(262 83% 58% / 0.05)
+    );
+
     /* Shadows with brand colors */
     --shadow-purple: 0 10px 30px -5px hsl(262 83% 58% / 0.3);
     --shadow-glow: 0 0 50px hsl(316 70% 68% / 0.4);
-    
+
     /* Animation variables */
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -98,9 +111,21 @@ All colors MUST be HSL.
     --ring: 262 83% 58%;
 
     /* Dark mode gradients */
-    --gradient-dark: linear-gradient(135deg, hsl(262, 45%, 18%), hsl(316, 35%, 25%));
-    --gradient-hero: linear-gradient(180deg, hsl(222.2 84% 4.9%) 0%, hsl(262 83% 58%) 100% );
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100% / 0.05), hsl(262 83% 58% / 0.1));
+    --gradient-dark: linear-gradient(
+      135deg,
+      hsl(262, 45%, 18%),
+      hsl(316, 35%, 25%)
+    );
+    --gradient-hero: linear-gradient(
+      180deg,
+      hsl(222.2 84% 4.9%) 0%,
+      hsl(262 83% 58%) 100%
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(0 0% 100% / 0.05),
+      hsl(262 83% 58% / 0.1)
+    );
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

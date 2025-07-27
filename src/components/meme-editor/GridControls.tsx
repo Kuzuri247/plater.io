@@ -1,51 +1,56 @@
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Grid, Maximize2 } from "lucide-react"
-import { GridConfig } from "@/pages/MemeEditor"
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Grid, Maximize2 } from 'lucide-react';
+import { GridConfig } from '@/pages/MemeEditor';
 
 interface GridControlsProps {
-  config: GridConfig
-  onChange: (config: GridConfig) => void
-  canvasSize: { width: number; height: number }
-  onCanvasSizeChange: (size: { width: number; height: number }) => void
+  config: GridConfig;
+  onChange: (config: GridConfig) => void;
+  canvasSize: { width: number; height: number };
+  onCanvasSizeChange: (size: { width: number; height: number }) => void;
 }
 
 const canvasPresets = [
-  { name: "Square (1:1)", width: 600, height: 600 },
-  { name: "Landscape (16:9)", width: 800, height: 450 },
-  { name: "Portrait (9:16)", width: 450, height: 800 },
-  { name: "Classic (4:3)", width: 800, height: 600 },
-  { name: "Instagram Post", width: 640, height: 640 },
-  { name: "Facebook Cover", width: 820, height: 312 },
-  { name: "Twitter Header", width: 600, height: 200 }
-]
+  { name: 'Square (1:1)', width: 600, height: 600 },
+  { name: 'Landscape (16:9)', width: 800, height: 450 },
+  { name: 'Portrait (9:16)', width: 450, height: 800 },
+  { name: 'Classic (4:3)', width: 800, height: 600 },
+  { name: 'Instagram Post', width: 640, height: 640 },
+  { name: 'Facebook Cover', width: 820, height: 312 },
+  { name: 'Twitter Header', width: 600, height: 200 },
+];
 
-export function GridControls({ 
-  config, 
-  onChange, 
-  canvasSize, 
-  onCanvasSizeChange 
+export function GridControls({
+  config,
+  onChange,
+  canvasSize,
+  onCanvasSizeChange,
 }: GridControlsProps) {
-  
   const handleRowsChange = (value: number[]) => {
-    onChange({ ...config, rows: value[0] })
-  }
+    onChange({ ...config, rows: value[0] });
+  };
 
   const handleColsChange = (value: number[]) => {
-    onChange({ ...config, cols: value[0] })
-  }
+    onChange({ ...config, cols: value[0] });
+  };
 
   const handleGapChange = (value: number[]) => {
-    onChange({ ...config, gap: value[0] })
-  }
+    onChange({ ...config, gap: value[0] });
+  };
 
   const handlePresetChange = (preset: string) => {
-    const selected = canvasPresets.find(p => p.name === preset)
+    const selected = canvasPresets.find((p) => p.name === preset);
     if (selected) {
-      onCanvasSizeChange({ width: selected.width, height: selected.height })
+      onCanvasSizeChange({ width: selected.width, height: selected.height });
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -79,7 +84,9 @@ export function GridControls({
 
       {/* Grid Rows */}
       <div>
-        <Label className="dark:text-white text-black text-sm">Rows: {config.rows}</Label>
+        <Label className="dark:text-white text-black text-sm">
+          Rows: {config.rows}
+        </Label>
         <Slider
           value={[config.rows]}
           onValueChange={handleRowsChange}
@@ -92,7 +99,9 @@ export function GridControls({
 
       {/* Grid Columns */}
       <div>
-        <Label className="dark:text-white text-black text-sm">Columns: {config.cols}</Label>
+        <Label className="dark:text-white text-black text-sm">
+          Columns: {config.cols}
+        </Label>
         <Slider
           value={[config.cols]}
           onValueChange={handleColsChange}
@@ -105,7 +114,9 @@ export function GridControls({
 
       {/* Grid Gap */}
       <div>
-        <Label className="dark:text-white text-black text-sm">Gap: {config.gap}px</Label>
+        <Label className="dark:text-white text-black text-sm">
+          Gap: {config.gap}px
+        </Label>
         <Slider
           value={[config.gap]}
           onValueChange={handleGapChange}
@@ -118,11 +129,15 @@ export function GridControls({
 
       {/* Grid Info */}
       <div className="p-3 bg-white/5 rounded border border-neutral-300 dark:border-white/20">
-        <div className="dark:text-white text-black text-sm flex justify-around" >
+        <div className="dark:text-white text-black text-sm flex justify-around">
           <div>Total Cells: {config.rows * config.cols}</div>
-          <div>Cell Size: {Math.round((canvasSize.width / config.cols) - (config.gap * 2))}×{Math.round((canvasSize.height / config.rows) - (config.gap * 2))}px</div>
+          <div>
+            Cell Size:{' '}
+            {Math.round(canvasSize.width / config.cols - config.gap * 2)}×
+            {Math.round(canvasSize.height / config.rows - config.gap * 2)}px
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

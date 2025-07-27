@@ -1,4 +1,4 @@
-import { Button } from "./ui/button";
+import { Button } from './ui/button';
 
 export function Hero() {
   return (
@@ -6,7 +6,7 @@ export function Hero() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center max-w-4xl mx-auto font-inter tracking-tighter">
           <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-            Everything in a{" "}
+            Everything in a{' '}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
               Plate
             </span>

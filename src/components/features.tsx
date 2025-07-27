@@ -1,6 +1,5 @@
-import { Card } from "./ui/card";
-import { Sparkles, Calendar, Type, Image } from "lucide-react";
-
+import { Card } from './ui/card';
+import { Sparkles, Calendar, Type, Image } from 'lucide-react';
 
 export function Features() {
   return (
@@ -35,12 +34,10 @@ export function Features() {
           </div>
           <h3 className="text-xl font-semibold mb-2">AI Scheduling</h3>
           <p className="text-muted-foreground">
-            Smart AI analyzes your audience to schedule posts at optimal
-            times
+            Smart AI analyzes your audience to schedule posts at optimal times
           </p>
         </Card>
       </div>
     </>
   );
 }
-

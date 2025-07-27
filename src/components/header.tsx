@@ -26,7 +26,7 @@ export function Header() {
             Editor
           </a>
           <a
-            href="#features"
+            href="/style-text"
             className="text-muted-foreground hover:text-foreground transition-smooth"
           >
             Texter

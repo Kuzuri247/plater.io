@@ -67,8 +67,8 @@ export function ImageUploader({ onImageAdd, gridConfig }: ImageUploaderProps) {
               >
                 {index + 1}
               </Button>
-              {/* Delete image button (shows only if image exists for this grid cell) */}
-              {gridConfig.images?.[index] && (
+              {/* Delete image button would go here if needed */}
+              {false && (
                 <button
                   type="button"
                   className="absolute -top-2 -right-2 bg-red-600 dark:bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow"

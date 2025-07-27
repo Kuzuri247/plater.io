@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import Index from "./pages/Index";
 import MemeEditor from "./pages/MemeEditor";
+import StyleTextEditor from "./pages/StyleTextEditor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/meme-editor" element={<MemeEditor />} />
+            <Route path="/style-text" element={<StyleTextEditor />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

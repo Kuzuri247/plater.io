@@ -46,13 +46,13 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
             width: CANVAS_SIZE.width,
             height: CANVAS_SIZE.height,
             backgroundColor: "var(--color-muted)",
-            overflow: "hidden", // Prevent overflow
+            overflow: "hidden", 
           }}
           onMouseMove={onMouseMove}
           onMouseUp={onMouseUp}
           onMouseLeave={onMouseUp}
         >
-          {/* Background Image - Properly Constrained */}
+          {/* Background Image  */}
           {backgroundImage && (
             <div 
               className="absolute inset-0 flex items-center justify-center pointer-events-none"

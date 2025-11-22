@@ -7,6 +7,12 @@ import { ActionsPanel } from "./components/action-panel";
 import { Background } from "./components/background";
 import { TextElement, CANVAS_SIZE } from "./components/types";
 
+interface HistoryState {
+  textElements: TextElement[];
+  backgroundImage: string | null;
+  backgroundImageSize: number;
+}
+
 export default function EditorPage() {
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
   const [backgroundImageSize, setBackgroundImageSize] = useState(70);
@@ -17,7 +23,6 @@ export default function EditorPage() {
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  // Current style state
   const [currentText, setCurrentText] = useState("Your Text Here");
   const [fontSize, setFontSize] = useState(32);
   const [fontFamily, setFontFamily] = useState("Inter");
@@ -25,51 +30,72 @@ export default function EditorPage() {
   const [color, setColor] = useState("#ffffff");
   const [textShadow, setTextShadow] = useState("2px 2px 4px rgba(0,0,0,0.8)");
 
-  // History - ONLY for text content and styles, NOT position
-  const [history, setHistory] = useState<TextElement[][]>([[]]);
+  const [history, setHistory] = useState<HistoryState[]>([
+    { textElements: [], backgroundImage: null, backgroundImageSize: 70 },
+  ]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
-  const saveHistory = (state: TextElement[]) => {
+  const saveHistory = (
+    newElements: TextElement[],
+    newBg: string | null,
+    newBgSize: number
+  ) => {
     const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push(JSON.parse(JSON.stringify(state)));
+    newHistory.push({
+      textElements: JSON.parse(JSON.stringify(newElements)),
+      backgroundImage: newBg,
+      backgroundImageSize: newBgSize,
+    });
     setHistory(newHistory);
     setHistoryIndex(newHistory.length - 1);
   };
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
-    reader.onload = (e) => setBackgroundImage(e.target?.result as string);
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      setBackgroundImage(result);
+      saveHistory(textElements, result, backgroundImageSize);
+    };
     reader.readAsDataURL(file);
+  };
+
+  const handleBgSizeChange = (size: number) => {
+    setBackgroundImageSize(size);
   };
 
   const addTextElement = () => {
     const newElement: TextElement = {
       id: `text_${Date.now()}`,
       content: currentText || "New Text",
-      position: { x: CANVAS_SIZE.width / 2 - 100, y: CANVAS_SIZE.height / 2 - 25 },
+      position: {
+        x: CANVAS_SIZE.width / 2 - 100,
+        y: CANVAS_SIZE.height / 2 - 25,
+      },
       style: { fontSize, fontFamily, fontWeight, color, textShadow },
     };
     const updated = [...textElements, newElement];
     setTextElements(updated);
     setSelectedElement(newElement.id);
-    saveHistory(updated);
+    saveHistory(updated, backgroundImage, backgroundImageSize);
   };
 
-  // Update position - NO HISTORY
-  const updateElementPosition = (elementId: string, position: { x: number; y: number }) => {
+  const updateElementPosition = (
+    elementId: string,
+    position: { x: number; y: number }
+  ) => {
     setTextElements((prev) =>
       prev.map((el) => (el.id === elementId ? { ...el, position } : el))
     );
   };
 
-  // Update content/style - SAVE HISTORY
   const updateSelectedElement = (updates: Partial<TextElement>) => {
     if (!selectedElement) return;
     const updated = textElements.map((el) =>
       el.id === selectedElement ? { ...el, ...updates } : el
     );
     setTextElements(updated);
-    saveHistory(updated);
+    saveHistory(updated, backgroundImage, backgroundImageSize);
   };
 
   const handleTextChange = (value: string) => {
@@ -80,8 +106,13 @@ export default function EditorPage() {
     }
   };
 
-  const handleStyleChange = (property: keyof TextElement["style"], value: any) => {
-    const selectedElementData = textElements.find((el) => el.id === selectedElement);
+  const handleStyleChange = (
+    property: keyof TextElement["style"],
+    value: any
+  ) => {
+    const selectedElementData = textElements.find(
+      (el) => el.id === selectedElement
+    );
     if (selectedElementData) {
       updateSelectedElement({
         style: { ...selectedElementData.style, [property]: value },
@@ -95,22 +126,38 @@ export default function EditorPage() {
     }
   };
 
+  const restoreState = (targetState: HistoryState) => {
+    setBackgroundImage(targetState.backgroundImage);
+    setBackgroundImageSize(targetState.backgroundImageSize);
+
+    const mergedElements = targetState.textElements.map((histEl) => {
+      const currentEl = textElements.find((el) => el.id === histEl.id);
+      const position = currentEl ? currentEl.position : histEl.position;
+      return { ...histEl, position };
+    });
+
+    setTextElements(mergedElements);
+  };
+
   const undo = () => {
     if (historyIndex > 0) {
-      setHistoryIndex(historyIndex - 1);
-      setTextElements(history[historyIndex - 1]);
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      restoreState(history[newIndex]);
     }
   };
 
   const redo = () => {
     if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1);
-      setTextElements(history[historyIndex + 1]);
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      restoreState(history[newIndex]);
     }
   };
 
   const handleElementMouseDown = (e: React.MouseEvent, elementId: string) => {
     e.preventDefault();
+    e.stopPropagation();
     const element = textElements.find((el) => el.id === elementId);
     if (!element) return;
 
@@ -129,16 +176,14 @@ export default function EditorPage() {
       y: e.clientY - canvasRect.top - dragOffset.y,
     };
 
-    newPosition.x = Math.max(0, Math.min(newPosition.x, CANVAS_SIZE.width - 200));
-    newPosition.y = Math.max(0, Math.min(newPosition.y, CANVAS_SIZE.height - 50));
+    newPosition.x = Math.max(0, Math.min(newPosition.x, CANVAS_SIZE.width));
+    newPosition.y = Math.max(0, Math.min(newPosition.y, CANVAS_SIZE.height));
 
-    // Update position - NO HISTORY SAVED
     updateElementPosition(selectedElement, newPosition);
   };
 
   const handleMouseUp = () => {
     setIsDragging(false);
-    // NO HISTORY SAVED ON MOUSE UP
   };
 
   const downloadImage = () => {
@@ -173,11 +218,16 @@ export default function EditorPage() {
       link.click();
     };
 
-    ctx.fillStyle = "#f0f0f0";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (!backgroundImage) {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
 
     if (backgroundImage) {
       const img = new Image();
+      img.crossOrigin = "anonymous";
       img.src = backgroundImage;
       img.onload = () => {
         const targetWidth = (canvas.width * backgroundImageSize) / 100;
@@ -196,60 +246,61 @@ export default function EditorPage() {
     }
   };
 
-  const selectedElementData = textElements.find((el) => el.id === selectedElement);
+  const selectedElementData = textElements.find(
+    (el) => el.id === selectedElement
+  );
 
   return (
-    <div className="h-screen bg-background overflow-hidden">
-      <div className="h-full px-4 py-6 overflow-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-[1600px] mx-auto">
-          {/* Left Sidebar */}
-          <div className="lg:col-span-1 space-y-4">
-            <TextStylePanel
-              selectedElement={selectedElementData}
-              currentText={currentText}
-              fontSize={fontSize}
-              fontFamily={fontFamily}
-              fontWeight={fontWeight}
-              color={color}
-              textShadow={textShadow}
-              onTextChange={handleTextChange}
-              onFontFamilyChange={(v) => handleStyleChange("fontFamily", v)}
-              onFontSizeChange={(v) => handleStyleChange("fontSize", v)}
-              onFontWeightChange={(v) => handleStyleChange("fontWeight", v)}
-              onColorChange={(v) => handleStyleChange("color", v)}
-              onTextShadowChange={(v) => handleStyleChange("textShadow", v)}
-              onAddText={addTextElement}
-            />
-            <ActionsPanel onDownload={downloadImage} />
-          </div>
+    <div className="flex max-h-screen w-full overflow-hidden bg-background pt-16">
+      <div className="w-80 shrink-0 border-r bg-surface  flex flex-col h-full">
+        <div className="p-4 flex-1 overflow-y-auto">
+          <TextStylePanel
+            selectedElement={selectedElementData}
+            currentText={currentText}
+            fontSize={fontSize}
+            fontFamily={fontFamily}
+            fontWeight={fontWeight}
+            color={color}
+            textShadow={textShadow}
+            onTextChange={handleTextChange}
+            onFontFamilyChange={(v) => handleStyleChange("fontFamily", v)}
+            onFontSizeChange={(v) => handleStyleChange("fontSize", v)}
+            onFontWeightChange={(v) => handleStyleChange("fontWeight", v)}
+            onColorChange={(v) => handleStyleChange("color", v)}
+            onTextShadowChange={(v) => handleStyleChange("textShadow", v)}
+            onAddText={addTextElement}
+          />
+        </div>
+        <div className="p-4 border-t bg-surface">
+          <ActionsPanel onDownload={downloadImage} />
+        </div>
+      </div>
 
-          {/* Center - Canvas */}
-          <div className="lg:col-span-2">
-            <Canvas
-              ref={canvasRef}
-              backgroundImage={backgroundImage}
-              backgroundImageSize={backgroundImageSize}
-              textElements={textElements}
-              selectedElement={selectedElement}
-              onElementMouseDown={handleElementMouseDown}
-              onMouseMove={handleCanvasMouseMove}
-              onMouseUp={handleMouseUp}
-              onUndo={undo}
-              onRedo={redo}
-              canUndo={historyIndex > 0}
-              canRedo={historyIndex < history.length - 1}
-            />
-          </div>
+      <div className=" overflow-hidden bg-muted/30 flex items-center justify-center p-8 relative">
+        <Canvas
+          ref={canvasRef}
+          backgroundImage={backgroundImage}
+          backgroundImageSize={backgroundImageSize}
+          textElements={textElements}
+          selectedElement={selectedElement}
+          onElementMouseDown={handleElementMouseDown}
+          onMouseMove={handleCanvasMouseMove}
+          onMouseUp={handleMouseUp}
+          onUndo={undo}
+          onRedo={redo}
+          canUndo={historyIndex > 0}
+          canRedo={historyIndex < history.length - 1}
+        />
+      </div>
 
-          {/* Right Sidebar */}
-          <div className="lg:col-span-1">
-            <Background
-              backgroundImage={backgroundImage}
-              imageSize={backgroundImageSize}
-              onImageUpload={handleImageUpload}
-              onImageSizeChange={setBackgroundImageSize}
-            />
-          </div>
+      <div className="w-72 flex-shrink-0 border-l bg-surface flex flex-col h-full overflow-y-auto">
+        <div className="p-4">
+          <Background
+            backgroundImage={backgroundImage}
+            imageSize={backgroundImageSize}
+            onImageUpload={handleImageUpload}
+            onImageSizeChange={handleBgSizeChange}
+          />
         </div>
       </div>
     </div>

@@ -1,47 +1,18 @@
 @import "tailwindcss";
 
-:root {
-  /* Light mode base variables */
-  --background: oklch(98% 0.01 270);
-  --surface: oklch(100% 0 0);
-  --foreground: oklch(15% 0.02 270);
-  --muted: oklch(92% 0.01 270);
-  --muted-foreground: oklch(50% 0.02 270);
-  --border: oklch(90% 0.01 270);
-  --primary: oklch(55% 0.22 270);
-  --primary-foreground: oklch(98% 0 0);
-  --secondary: oklch(95% 0.02 270);
-  --secondary-foreground: oklch(40% 0.1 270);
-  --destructive: oklch(60% 0.18 25);
-  --destructive-foreground: oklch(98% 0 0);
-  --shadow-glow: 0 0 20px -5px oklch(60% 0.25 270 / 0.4);
-}
+/* CSS Custom Properties for Light and Dark Modes */
 
-.dark {
-  /* Dark mode variables */
-  --background: oklch(12% 0.02 270);
-  --surface: oklch(16% 0.025 270);
-  --foreground: oklch(98% 0.01 270);
-  --muted: oklch(20% 0.03 270);
-  --muted-foreground: oklch(70% 0.02 270);
-  --border: oklch(22% 0.03 270);
-  --primary: oklch(65% 0.22 270);
-  --primary-foreground: oklch(100% 0 0);
-  --secondary: oklch(25% 0.04 270);
-  --secondary-foreground: oklch(85% 0.05 270);
-  --destructive: oklch(55% 0.2 25);
-  --destructive-foreground: oklch(98% 0 0);
-  --shadow-glow: 0 0 30px -10px oklch(65% 0.25 270 / 0.5);
-}
 
+
+/* Inline theme variables for usage */
 @theme inline {
   /* shadows */
-    --shadow-next: 0 80px 30px rgb(0, 0.1, 0.1, 0.90);
+  --shadow-next: 0 80px 30px rgba(0, 0, 0, 0.1);
 
   /* fonts */
   --font-inter: var(--font-inter);
   --font-manrope: var(--font-manrope);
-  --font-jakarta: var(--font-jakarta);
+  --font-space: var(--font-space);
 
   /* colors */
   --color-background: var(--background);
@@ -58,7 +29,81 @@
   --color-destructive-foreground: var(--destructive-foreground);
 }
 
+/* Base style applying Tailwind utilities */
 @layer base {
+
+:root {
+  /* Light Mode - Industrial Clean */
+  --background: 0.99 0.005 100;
+  --foreground: 0.14 0.02 100;
+
+  --card: 1 0 0;
+  --card-foreground: 0.14 0.02 100;
+
+  --popover: 1 0 0;
+  --popover-foreground: 0.14 0.02 100;
+
+  --primary: 0.8 0.18 95; /* Strong Industrial Yellow */
+  --primary-foreground: 0.1 0.03 100; /* Black text on yellow */
+
+  --secondary: 0.95 0.01 100;
+  --secondary-foreground: 0.14 0.02 100;
+
+  --muted: 0.94 0.01 100;
+  --muted-foreground: 0.45 0.02 100;
+
+  --accent: 0.94 0.02 100;
+  --accent-foreground: 0.14 0.02 100;
+
+  --destructive: 0.6 0.15 25;
+  --destructive-foreground: 0.98 0.005 100;
+
+  --success: 0.65 0.18 145; /* Green */
+  --success-foreground: 0.98 0 100;
+
+  --border: 0.9 0.02 100;
+  --input: 0.9 0.02 100;
+  --ring: 0.8 0.18 95;
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Dark Mode - Cyberpunk/Neon Future */
+  --background: 0.1 0.01 100; /* Deep Carbon Black */
+  --foreground: 0.95 0.01 100; /* Off-white */
+
+  --card: 0.12 0.01 100; /* Slightly lighter carbon */
+  --card-foreground: 0.95 0.01 100;
+
+  --popover: 0.12 0.01 100;
+  --popover-foreground: 0.95 0.01 100;
+
+  --primary: 0.88 0.22 100; /* Bright Neon Yellow */
+  --primary-foreground: 0.1 0.02 100; /* Black text on neon button */
+
+  --secondary: 0.2 0.02 100;
+  --secondary-foreground: 0.95 0.01 100;
+
+  --muted: 0.18 0.02 100;
+  --muted-foreground: 0.65 0.02 100;
+
+  --accent: 0.18 0.03 100;
+  --accent-foreground: 0.88 0.22 100; /* Yellow text on accent hover */
+
+  --destructive: 0.4 0.15 25;
+  --destructive-foreground: 0.98 0.005 100;
+
+  --success: 0.75 0.2 145; /* Neon Green */
+  --success-foreground: 0.1 0.02 100;
+
+  --border: 0.22 0.02 100; /* Dark Yellow-ish Grey */
+  --input: 0.22 0.02 100;
+  --ring: 0.88 0.22 100;
+}
+
+
+
   * {
     @apply border-border;
   }

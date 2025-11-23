@@ -55,7 +55,6 @@ const BentoCard = ({
   </motion.div>
 );
 
-// --- 3D Tilt Card Wrapper for Preview ---
 const TiltCard = ({
   children,
   className,
@@ -110,7 +109,6 @@ const TiltCard = ({
   );
 };
 
-// --- Twinkling Background Effect ---
 const TwinklingStars = () => {
   const stars = [
     { top: "10%", left: "20%", delay: 0 },
@@ -144,7 +142,6 @@ const TwinklingStars = () => {
 };
 
 export const BentoGrid = () => {
-  // --- Editor Rotation State (First Card) ---
   const [editorStep, setEditorStep] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -153,7 +150,6 @@ export const BentoGrid = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // --- Typography Interaction State (Second Card) ---
   const [fontIndex, setFontIndex] = useState(0);
   const [activeStyles, setActiveStyles] = useState<string[]>([]);
   const [isCardHovered, setIsCardHovered] = useState(false);
@@ -186,7 +182,6 @@ export const BentoGrid = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isCardHovered, fonts.length]);
 
-  // --- Scheduler State (Third Card) ---
   const [currentMonth, setCurrentMonth] = useState(0);
   const months = [
     "JANUARY",
@@ -242,7 +237,6 @@ export const BentoGrid = () => {
 
   const calendarDays = getCalendarDays(currentMonth);
 
-  // --- Preview State (Fourth Card) ---
   const [previewMode, setPreviewMode] = useState<"mobile" | "desktop">(
     "mobile"
   );
@@ -284,10 +278,8 @@ export const BentoGrid = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-6 md:grid-rows-4 gap-4 h-auto md:h-[850px]">
-          {/* Large Item: Smart Templates / Editor (2x2) */}
           <BentoCard className="md:col-span-4 md:row-span-2 flex flex-col p-5 md:p-8 hover:border-primary/30 transition-colors">
-            {/* System Status Badge */}
-            <div className="absolute top-4 right-4 md:top-6 md:right-6">
+            <div className="absolute top-4 right-4 md:top-6 md:right-6 max-sm:hidden">
               <div className="flex items-center gap-2 px-2 py-1 bg-background/80 backdrop-blur border-2 rounded-full">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>

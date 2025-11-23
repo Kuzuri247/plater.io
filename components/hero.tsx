@@ -4,15 +4,15 @@ import { motion, AnimatePresence } from "motion/react";
 import { XPost, LinkedInPost, InstagramPost } from "./posts";
 import { ScalePattern } from "./patterns";
 
-export const Hero = ({ children }: { children: React.ReactNode }) => {
+export const Hero = () => {
   const [activeSlide, setActiveSlide] = useState(0);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setActiveSlide((prev) => (prev + 1) % 3);
-  //   }, 4000);
-  //   return () => clearInterval(interval);
-  // }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % 3);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section className="relative w-full md:w-[80%] mx-auto min-h-[85vh] md:min-h-[90vh] flex items-center justify-center pt-24 pb-10 bg-background">

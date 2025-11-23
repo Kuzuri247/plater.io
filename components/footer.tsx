@@ -4,10 +4,9 @@ import { Github, Twitter, Globe, ExternalLink } from 'lucide-react';
 export const Footer: React.FC = () => {
   return (
     <footer className="relative bg-background border-t border-border overflow-hidden pt-12 md:pt-16 pb-8">
-      {/* 3D Perspective Grid Background - Top Origin - Constrained Height */}
       <div className="absolute inset-x-0 top-0 h-[300px] md:h-[400px] pointer-events-none overflow-hidden flex justify-center">
          <div 
-            className="w-[150vw] h-full absolute top-0 bg-[size:50px_50px] opacity-[0.15]"
+            className="w-[150vw] h-full absolute top-0 bg-size-[50px_50px] opacity-70 dark:opacity-25"
             style={{
                 backgroundImage: 'linear-gradient(to right, oklch(var(--primary)) 1px, transparent 1px), linear-gradient(to bottom, oklch(var(--primary)) 1px, transparent 1px)',
                 transform: 'perspective(500px) rotateX(60deg)',
@@ -57,8 +56,8 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Section - Clean Background Area */}
-        <div className="font-inter pt-8 flex flex-col md:flex-row justify-center items-center gap-6 text-muted-foreground text-xs uppercase tracking-wider">
-            <span>© {new Date().getFullYear()} PlateCreator Inc.</span>
+        <div className="font-inter pt-8 flex flex-row justify-center items-center gap-6 text-muted-foreground text-xs uppercase tracking-wider">
+            <span>© {new Date().getFullYear()} Plator</span>
             <span className="hidden md:block w-1 h-1 rounded-full bg-border"></span>
             <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
             <span className="hidden md:block w-1 h-1 rounded-full bg-border"></span>

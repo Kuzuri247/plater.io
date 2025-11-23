@@ -62,7 +62,7 @@ export const XPost = () => (
         </div>
 
         {/* Post Media (Video/Image Placeholder) */}
-        <div className="rounded-2xl overflow-hidden border border-border/50 mb-3 bg-muted/20 relative aspect-2/2 flex items-center justify-center group cursor-pointer">
+        <div className="rounded-2xl overflow-hidden border border-border/50 mb-3 bg-muted/20 relative h-48 w-92 flex items-center justify-center group cursor-pointer">
           <div
             className="absolute inset-0 opacity-50"
             style={{

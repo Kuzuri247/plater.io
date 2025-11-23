@@ -21,7 +21,7 @@ export const XPost = () => (
       <div className="shrink-0">
         <div className="w-10 h-10 bg-muted rounded-full overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
           <Image
-            src="/pfp1.jpg"
+            src="/pfp2.jpg"
             alt="avatar"
             width={45}
             height={45}
@@ -132,7 +132,7 @@ export const LinkedInPost = () => (
         {/* Added overflow-hidden here */}
         <div className="w-10 h-10 bg-muted rounded-full overflow-hidden">
           <Image
-            src="/pfp2.jpg"
+            src="/pfp1.jpg"
             alt="avatar"
             width={45}
             height={45}

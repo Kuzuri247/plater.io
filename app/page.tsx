@@ -28,7 +28,7 @@ function App() {
           </div>
           <div className="hidden md:flex gap-8 text-xs font-medium text-muted-foreground uppercase tracking-widest">
             <a
-              href="/editor"
+              href="/"
               className="hover:text-foreground transition-colors"
             >
               Features

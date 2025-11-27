@@ -16,46 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-  TextElement,
-  ImageStyle,
-  FONT_FAMILIES,
-  FONT_WEIGHTS,
-  SHADOW_PRESETS,
-} from "./types";
-
-interface LeftPanelProps {
-  selectedElement: TextElement | undefined;
-  // Text State
-  currentText: string;
-  fontSize: number;
-  fontFamily: string;
-  fontWeight: string;
-  color: string;
-  textShadow: string;
-  textBorderRadius: number;
-  textBackgroundColor: string;
-  textPadding: number;
-  showTextBackground: boolean;
-  // Image State
-  userImageStyle: ImageStyle;
-  
-  // Handlers
-  onTextChange: (value: string) => void;
-  onFontFamilyChange: (value: string) => void;
-  onFontSizeChange: (value: number) => void;
-  onFontWeightChange: (value: string) => void;
-  onColorChange: (value: string) => void;
-  onTextShadowChange: (value: string) => void;
-  onTextBorderRadiusChange: (value: number) => void;
-  onTextBackgroundColorChange: (value: string) => void;
-  onTextPaddingChange: (value: number) => void;
-  onShowTextBackgroundChange: (value: boolean) => void;
-  onAddText: () => void;
-  
-  onImageStyleChange: (updates: Partial<ImageStyle>) => void;
-  onImageUpload: (file: File) => void;
-}
+import { FONT_FAMILIES, FONT_WEIGHTS, SHADOW_PRESETS } from "./types";
+import { LeftPanelProps } from "./types";
 
 export function LeftPanel({
   selectedElement,
@@ -84,17 +46,19 @@ export function LeftPanel({
   onImageStyleChange,
   onImageUpload,
 }: LeftPanelProps) {
-  
   const activeText = selectedElement?.content ?? currentText;
   const activeFontSize = selectedElement?.style.fontSize ?? fontSize;
   const activeFontFamily = selectedElement?.style.fontFamily ?? fontFamily;
   const activeFontWeight = selectedElement?.style.fontWeight ?? fontWeight;
   const activeColor = selectedElement?.style.color ?? color;
   const activeTextShadow = selectedElement?.style.textShadow ?? textShadow;
-  const activeTextBorderRadius = selectedElement?.style.borderRadius ?? textBorderRadius;
-  const activeTextBgColor = selectedElement?.style.backgroundColor ?? textBackgroundColor;
+  const activeTextBorderRadius =
+    selectedElement?.style.borderRadius ?? textBorderRadius;
+  const activeTextBgColor =
+    selectedElement?.style.backgroundColor ?? textBackgroundColor;
   const activeTextPadding = selectedElement?.style.padding ?? textPadding;
-  const activeShowTextBg = selectedElement?.style.showBackground ?? showTextBackground;
+  const activeShowTextBg =
+    selectedElement?.style.showBackground ?? showTextBackground;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -116,19 +80,29 @@ export function LeftPanel({
         </TabsList>
 
         {/* === IMAGE CONTROLS === */}
-        <TabsContent value="image" className="flex-1 flex flex-col gap-6 data-[state=inactive]:hidden focus-visible:outline-none">
+        <TabsContent
+          value="image"
+          className="flex-1 flex flex-col gap-6 data-[state=inactive]:hidden focus-visible:outline-none"
+        >
           <div className="space-y-5">
             <div className="space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Source</Label>
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Source
+              </Label>
               <div className="relative">
-                <Input 
-                  type="file" 
+                <Input
+                  type="file"
                   accept="image/*"
                   onChange={handleFileChange}
                   className="hidden"
                   id="image-upload"
                 />
-                <Button asChild variant="outline" size="sm" className="w-full border-dashed bg-transparent border-border/50 hover:bg-muted/50">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-dashed bg-transparent border-border/50 hover:bg-muted/50"
+                >
                   <label htmlFor="image-upload" className="cursor-pointer">
                     Upload Image
                   </label>
@@ -139,12 +113,16 @@ export function LeftPanel({
             <Separator className="bg-border/50" />
 
             <div className="space-y-4">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Properties</Label>
-              
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Properties
+              </Label>
+
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-medium">Scale</Label>
-                  <span className="text-xs text-muted-foreground">{userImageStyle.scale}%</span>
+                  <span className="text-xs text-muted-foreground">
+                    {userImageStyle.scale}%
+                  </span>
                 </div>
                 <Slider
                   value={[userImageStyle.scale]}
@@ -158,11 +136,15 @@ export function LeftPanel({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-medium">Opacity</Label>
-                  <span className="text-xs text-muted-foreground">{userImageStyle.opacity}%</span>
+                  <span className="text-xs text-muted-foreground">
+                    {userImageStyle.opacity}%
+                  </span>
                 </div>
                 <Slider
                   value={[userImageStyle.opacity]}
-                  onValueChange={([val]) => onImageStyleChange({ opacity: val })}
+                  onValueChange={([val]) =>
+                    onImageStyleChange({ opacity: val })
+                  }
                   min={0}
                   max={100}
                   step={1}
@@ -172,7 +154,9 @@ export function LeftPanel({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-medium">Blur</Label>
-                  <span className="text-xs text-muted-foreground">{userImageStyle.blur}px</span>
+                  <span className="text-xs text-muted-foreground">
+                    {userImageStyle.blur}px
+                  </span>
                 </div>
                 <Slider
                   value={[userImageStyle.blur]}
@@ -186,7 +170,9 @@ export function LeftPanel({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-medium">Noise</Label>
-                  <span className="text-xs text-muted-foreground">{userImageStyle.noise}%</span>
+                  <span className="text-xs text-muted-foreground">
+                    {userImageStyle.noise}%
+                  </span>
                 </div>
                 <Slider
                   value={[userImageStyle.noise]}
@@ -200,11 +186,15 @@ export function LeftPanel({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-medium">Roundness</Label>
-                  <span className="text-xs text-muted-foreground">{userImageStyle.borderRadius}px</span>
+                  <span className="text-xs text-muted-foreground">
+                    {userImageStyle.borderRadius}px
+                  </span>
                 </div>
                 <Slider
                   value={[userImageStyle.borderRadius]}
-                  onValueChange={([val]) => onImageStyleChange({ borderRadius: val })}
+                  onValueChange={([val]) =>
+                    onImageStyleChange({ borderRadius: val })
+                  }
                   min={0}
                   max={100}
                   step={1}
@@ -213,8 +203,8 @@ export function LeftPanel({
 
               <div className="space-y-2">
                 <Label className="text-xs font-medium">Shadow</Label>
-                <Select 
-                  value={userImageStyle.shadow} 
+                <Select
+                  value={userImageStyle.shadow}
                   onValueChange={(val) => onImageStyleChange({ shadow: val })}
                 >
                   <SelectTrigger className="h-8 bg-transparent border-border/50">
@@ -234,16 +224,26 @@ export function LeftPanel({
         </TabsContent>
 
         {/* === TEXT CONTROLS === */}
-        <TabsContent value="text" className="flex-1 flex flex-col gap-4 data-[state=inactive]:hidden pr-1 focus-visible:outline-none">
+        <TabsContent
+          value="text"
+          className="flex-1 flex flex-col gap-4 data-[state=inactive]:hidden pr-1 focus-visible:outline-none"
+        >
           <div className="space-y-3">
-             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Content</Label>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Content
+            </Label>
             <Textarea
               value={activeText}
               onChange={(e) => onTextChange(e.target.value)}
-              className="min-h-8 resize-none bg-transparent placeholder:font-manrope"
+              className="min-h-8 resize-none bg-transparent placeholder:font-inter"
               placeholder="Type text here..."
             />
-            <Button onClick={onAddText} variant="outline" size="sm" className="w-full bg-transparent border-dashed border hover:bg-muted/50">
+            <Button
+              onClick={onAddText}
+              variant="outline"
+              size="sm"
+              className="w-full bg-transparent border-dashed border hover:bg-muted/50"
+            >
               <Plus className="w-3.5 h-3.5 mr-2" /> Add Text Layer
             </Button>
           </div>
@@ -251,61 +251,96 @@ export function LeftPanel({
           <Separator className="bg-border/50" />
 
           <div className="space-y-4">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Typography</Label>
-            
+            <Label className="text-xs font-semibold uppercase tracking-wider">
+              Typography
+            </Label>
+
             <div className="grid grid-cols-2 gap-2">
-                <Select value={activeFontFamily} onValueChange={onFontFamilyChange}>
-                <SelectTrigger className="h-8 bg-transparent border-border/50"><SelectValue /></SelectTrigger>
+              <Select
+                value={activeFontFamily}
+                onValueChange={onFontFamilyChange}
+              >
+                <SelectTrigger className="h-8 bg-transparent border-border/50 font-manrope">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent className="font-manrope">
-                    {FONT_FAMILIES.map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}
+                  {FONT_FAMILIES.map((f) => (
+                    <SelectItem key={f} value={f}>
+                      {f}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
-                </Select>
-                <Select value={activeFontWeight} onValueChange={onFontWeightChange}>
-                <SelectTrigger className="h-8 bg-transparent border-border/50 "><SelectValue /></SelectTrigger>
+              </Select>
+              <Select
+                value={activeFontWeight}
+                onValueChange={onFontWeightChange}
+              >
+                <SelectTrigger className="h-8 bg-transparent border-border/50 font-manrope">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent className="font-manrope">
-                    {FONT_WEIGHTS.map((w) => <SelectItem key={w.value} value={w.value}>{w.label}</SelectItem>)}
+                  {FONT_WEIGHTS.map((w) => (
+                    <SelectItem key={w.value} value={w.value}>
+                      {w.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
-                </Select>
+              </Select>
             </div>
 
             <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                    <Label className="text-xs font-medium">Color & Size</Label>
-                    <span className="text-xs text-muted-foreground">{activeFontSize}px</span>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Color & Size
+                </Label>
+                <span className="text-xs text-muted-foreground font-manrope">
+                  {activeFontSize}px
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="relative group cursor-pointer">
+                  <div
+                    className="size-6 rounded-full border border-border shadow-sm flex items-center justify-center transition-transform hover:scale-105"
+                    style={{ backgroundColor: activeColor }}
+                  />
+                  <Input
+                    type="color"
+                    value={activeColor}
+                    onChange={(e) => onColorChange(e.target.value)}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full p-0 border-0"
+                  />
                 </div>
-                
-                <div className="flex items-center gap-3">
-                    <div className="relative group cursor-pointer">
-                    <div 
-                        className="size-6 rounded-full border border-border shadow-sm flex items-center justify-center transition-transform hover:scale-105"
-                        style={{ backgroundColor: activeColor }}
-                    />
-                    <Input 
-                        type="color" 
-                        value={activeColor} 
-                        onChange={(e) => onColorChange(e.target.value)} 
-                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full p-0 border-0" 
-                    />
-                    </div>
-                    
-                    <Slider 
-                    value={[activeFontSize]} 
-                    onValueChange={([v]) => onFontSizeChange(v)} 
-                    min={12} 
-                    max={160} 
-                    className="flex-1"
-                    />
-                </div>
+
+                <Slider
+                  value={[activeFontSize]}
+                  onValueChange={([v]) => onFontSizeChange(v)}
+                  min={12}
+                  max={80}
+                  className="flex-1"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
-                <Label className="text-xs font-medium">Text Shadow</Label>
-                <Select value={activeTextShadow} onValueChange={onTextShadowChange}>
-                <SelectTrigger className="h-8 bg-transparent border-border/50"><SelectValue placeholder="None" /></SelectTrigger>
+              <Label className="text-xs font-medium text-muted-foreground">
+                Text Shadow
+              </Label>
+              <Select
+                value={activeTextShadow}
+                onValueChange={onTextShadowChange}
+              >
+                <SelectTrigger className="h-8 bg-transparent border-border/50 font-manrope">
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
                 <SelectContent>
-                    {SHADOW_PRESETS.map((s) => <SelectItem key={s.name} value={s.value}>{s.name}</SelectItem>)}
+                  {SHADOW_PRESETS.map((s) => (
+                    <SelectItem key={s.name} value={s.value}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
-                </Select>
+              </Select>
             </div>
           </div>
 
@@ -313,8 +348,10 @@ export function LeftPanel({
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Background Box</Label>
-              <Switch 
+              <Label className="text-xs font-semibold  uppercase tracking-wider">
+                Background Box
+              </Label>
+              <Switch
                 checked={activeShowTextBg}
                 onCheckedChange={onShowTextBackgroundChange}
               />
@@ -323,21 +360,57 @@ export function LeftPanel({
             {activeShowTextBg && (
               <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 pl-1">
                 <div className="flex items-center justify-between">
-                   <Label className="text-xs font-medium">Box Color</Label>
-                   <div className="relative size-6 rounded-md border border-border overflow-hidden">
-                      <div className="absolute inset-0" style={{ backgroundColor: activeTextBgColor }} />
-                      <Input type="color" value={activeTextBgColor} onChange={(e) => onTextBackgroundColorChange(e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full p-0 border-0" />
-                   </div>
+                  <Label className="text-xs font-medium text-muted-foreground">
+                    Box Color
+                  </Label>
+                  <div className="relative size-6 rounded-md overflow-hidden border-2 border-neutral-300 dark:border-neutral-500">
+                    <div
+                      className="absolute inset-0"
+                      style={{ backgroundColor: activeTextBgColor }}
+                    />
+                    <Input
+                      type="color"
+                      value={activeTextBgColor}
+                      onChange={(e) =>
+                        onTextBackgroundColorChange(e.target.value)
+                      }
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full p-0 border-0"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="flex justify-between"><Label className="text-xs font-medium">Rounded</Label><span className="text-xs text-muted-foreground">{activeTextBorderRadius}px</span></div>
-                  <Slider value={[activeTextBorderRadius]} onValueChange={([v]) => onTextBorderRadiusChange(v)} min={0} max={50} />
+                  <div className="flex justify-between">
+                    <Label className="text-xs font-medium text-muted-foreground">
+                      Rounded
+                    </Label>
+                    <span className="text-xs text-muted-foreground font-manrope">
+                      {activeTextBorderRadius}px
+                    </span>
+                  </div>
+                  <Slider
+                    value={[activeTextBorderRadius]}
+                    onValueChange={([v]) => onTextBorderRadiusChange(v)}
+                    min={0}
+                    max={50}
+                  />
                 </div>
 
                 <div className="space-y-3">
-                  <div className="flex justify-between"><Label className="text-xs font-medium">Padding</Label><span className="text-xs text-muted-foreground">{activeTextPadding}px</span></div>
-                  <Slider value={[activeTextPadding]} onValueChange={([v]) => onTextPaddingChange(v)} min={0} max={60} />
+                  <div className="flex justify-between">
+                    <Label className="text-xs font-medium text-muted-foreground">
+                      Padding
+                    </Label>
+                    <span className="text-xs text-muted-foreground font-manrope">
+                      {activeTextPadding}px
+                    </span>
+                  </div>
+                  <Slider
+                    value={[activeTextPadding]}
+                    onValueChange={([v]) => onTextPaddingChange(v)}
+                    min={0}
+                    max={30}
+                  />
                 </div>
               </div>
             )}

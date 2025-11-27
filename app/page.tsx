@@ -1,18 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import { Hero } from "@/components/hero";
 import { BentoGrid } from "@/components/bentogrid";
 import { Footer } from "@/components/footer";
 import { Pricing } from "@/components/pricing";
-import { Moon, Sun } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ReactLenis } from "lenis/react";
 
 function App() {
   return (
     <main className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground transition-colors duration-300 flex flex-col gap-16 md:gap-32">
-      {/* Fixed Navigation Bar */}
+      <ReactLenis root />
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md h-16 flex items-center transition-colors duration-300">
         <div className="w-[90%] md:w-[80%] mx-auto flex justify-between items-center">
           <div className="font-bold text-xl tracking-tighter font-display uppercase flex items-center text-foreground">

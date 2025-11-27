@@ -27,9 +27,53 @@ export interface TextElement {
   style: TextStyle;
 }
 
+export interface LeftPanelProps {
+  selectedElement: TextElement | undefined;
+  // Text State
+  currentText: string;
+  fontSize: number;
+  fontFamily: string;
+  fontWeight: string;
+  color: string;
+  textShadow: string;
+  textBorderRadius: number;
+  textBackgroundColor: string;
+  textPadding: number;
+  showTextBackground: boolean;
+  // Image State
+  userImageStyle: ImageStyle;
+  
+  // Handlers
+  onTextChange: (value: string) => void;
+  onFontFamilyChange: (value: string) => void;
+  onFontSizeChange: (value: number) => void;
+  onFontWeightChange: (value: string) => void;
+  onColorChange: (value: string) => void;
+  onTextShadowChange: (value: string) => void;
+  onTextBorderRadiusChange: (value: number) => void;
+  onTextBackgroundColorChange: (value: string) => void;
+  onTextPaddingChange: (value: number) => void;
+  onShowTextBackgroundChange: (value: boolean) => void;
+  onAddText: () => void;
+  
+  onImageStyleChange: (updates: Partial<ImageStyle>) => void;
+  onImageUpload: (file: File) => void;
+}
+export interface RightPanelProps {
+  canvasBackground: string;
+  aspectRatio: string;
+  exportFormat: string;
+  exportQuality: string;
+  onCanvasBackgroundChange: (value: string) => void;
+  onAspectRatioChange: (value: string) => void;
+  onExportFormatChange: (value: string) => void;
+  onExportQualityChange: (value: string) => void;
+  onDownload: () => void;
+}
+
+
 export const ASPECT_RATIOS = [
   { name: "16:9", label: "YouTube / Video", width: 900, height: 506, previewClass: "aspect-video" },
-  { name: "9:16", label: "TikTok / Story", width: 400, height: 711, previewClass: "aspect-[9/16]" },
   { name: "1:1", label: "Instagram Square", width: 600, height: 600, previewClass: "aspect-square" },
   { name: "4:5", label: "Instagram Portrait", width: 500, height: 625, previewClass: "aspect-[4/5]" },
   { name: "4:3", label: "Standard", width: 800, height: 600, previewClass: "aspect-[4/3]" },
@@ -46,7 +90,6 @@ export const FONT_FAMILIES = [
 ];
 
 export const FONT_WEIGHTS = [
-  { value: "normal", label: "Normal" },
   { value: "100", label: "Thin" },
   { value: "200", label: "Extra Light" },
   { value: "300", label: "Light" },

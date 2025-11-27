@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import { Provider } from "@/components/provider";
-import { ReactLenis } from "lenis/react";
+import { Toaster } from "sonner";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -34,8 +34,6 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${manrope.variable} ${space.variable} antialiased`}
       >
-        <ReactLenis root />
-
         <Provider
           attribute="class"
           defaultTheme="system"
@@ -45,6 +43,10 @@ export default function RootLayout({
           <main className="bg-background text-foreground font-space">
             {children}
           </main>
+          <Toaster
+            position="top-center"
+            swipeDirections={["right"]}
+          />
         </Provider>
       </body>
     </html>

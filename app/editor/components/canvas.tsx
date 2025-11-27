@@ -2,8 +2,7 @@
 
 import { forwardRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Undo2, Redo2, Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 import { TextElement, ImageStyle } from "./types";
 
 interface EditorCanvasProps {
@@ -21,12 +20,6 @@ interface EditorCanvasProps {
   onElementMouseDown: (e: React.MouseEvent, elementId: string) => void;
   onMouseMove: (e: React.MouseEvent) => void;
   onMouseUp: () => void;
-  onUndo: () => void;
-  onRedo: () => void;
-  onRefresh: () => void;
-  canUndo: boolean;
-  canRedo: boolean;
-  canRefresh: boolean;
 }
 
 export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
@@ -45,7 +38,6 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
       onElementMouseDown,
       onMouseMove,
       onMouseUp,
-    
     },
     ref,
   ) => {
@@ -64,51 +56,54 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
           onMouseUp={onMouseUp}
           onMouseLeave={onMouseUp}
         >
-          {/* User Image / Screenshot Layer */}
-          <div
-            className="absolute cursor-move transition-transform duration-75 ease-linear hover:ring-1 hover:ring-white/30"
-            onMouseDown={onImageMouseDown}
-            style={{
-              left: imagePosition.x,
-              top: imagePosition.y,
-              transform: `scale(${userImageStyle.scale / 100}) rotate(${userImageStyle.rotate}deg)`,
-              borderRadius: `${userImageStyle.borderRadius}px`,
-              boxShadow: userImageStyle.shadow === 'none' ? 'none' : userImageStyle.shadow,
-              opacity: userImageStyle.opacity / 100,
-              filter: `blur(${userImageStyle.blur}px)`,
-              maxWidth: "90%",
-              maxHeight: "90%",
-            }}
-          >
-            {userImageStyle.noise > 0 && (
-                <div 
-                    className="absolute inset-0 z-10 pointer-events-none rounded-[inherit]"
-                    style={{
-                        opacity: userImageStyle.noise / 100,
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")`
-                    }}
-                />
-            )}
+          {/* User Image Layer - Only renders when image exists */}
+          {userImage ? (
+            <div
+              className="absolute cursor-move transition-transform duration-75 ease-linear hover:ring-1 hover:ring-white/30"
+              onMouseDown={onImageMouseDown}
+              style={{
+                left: imagePosition.x,
+                top: imagePosition.y,
+                transform: `scale(${userImageStyle.scale / 100}) rotate(${userImageStyle.rotate}deg)`,
+                borderRadius: `${userImageStyle.borderRadius}px`,
+                boxShadow: userImageStyle.shadow === 'none' ? 'none' : userImageStyle.shadow,
+                opacity: userImageStyle.opacity / 100,
+                filter: `blur(${userImageStyle.blur}px)`,
+              }}
+            >
+              {/* Noise Overlay */}
+              {userImageStyle.noise > 0 && (
+                  <div 
+                      className="absolute inset-0 z-10 pointer-events-none rounded-[inherit]"
+                      style={{
+                          opacity: userImageStyle.noise / 100,
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")`
+                      }}
+                  />
+              )}
 
-            {userImage ? (
               <img
                 src={userImage}
                 alt="User upload"
-                className="block w-full h-full object-contain pointer-events-none"
+                draggable={false}
+                className="block object-contain pointer-events-none"
                 style={{
                   borderRadius: `${userImageStyle.borderRadius}px`,
+                  maxWidth: "none",
+                  maxHeight: "none",
                 }}
               />
-            ) : (
-              <div 
-                onClick={onEmptyClick}
-                className="w-64 h-40 bg-background/20 backdrop-blur-sm border-2 border-dashed border-white/30 rounded-lg flex flex-col items-center justify-center text-white/50 cursor-pointer hover:bg-background/30 hover:border-white/50 transition-all"
-              >
-                <ImageIcon className="w-8 h-8 mb-2 opacity-50" />
-                <span className="text-xs font-medium">Click to Upload</span>
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            /* Centered Upload Skeleton - Renders directly in flex container when no image */
+            <div 
+              onClick={onEmptyClick}
+              className="w-64 h-40 bg-background/20 backdrop-blur-sm border-2 border-dashed  border-neutral-400 rounded-lg flex flex-col items-center justify-center text-neutral-500 cursor-pointer hover:bg-background/30 hover:border-neutral-400 transition-all z-10"
+            >
+              <ImageIcon className="w-8 h-8 mb-2 opacity-50 text-neutral-400" />
+              <span className="text-xs text-neutral-400 font-medium">Click to Upload</span>
+            </div>
+          )}
 
           {/* Text Elements Layer */}
           {textElements.map((element) => (
@@ -136,8 +131,6 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
             </div>
           ))}
         </div>
-
-        
       </Card>
     );
   },

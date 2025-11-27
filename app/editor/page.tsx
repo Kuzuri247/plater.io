@@ -6,7 +6,7 @@ import { LeftPanel } from "./components/left-panel";
 import { RightPanel } from "./components/right-panel";
 import { TextElement, ImageStyle, ASPECT_RATIOS } from "./components/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Twitter } from "lucide-react";
+import { ArrowLeft, Twitter, Undo2, Redo2, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -28,8 +28,11 @@ export default function EditorPage() {
 
   // --- Canvas State ---
   const [aspectRatioName, setAspectRatioName] = useState("4:3");
-  const currentAspectRatio = ASPECT_RATIOS.find(r => r.name === aspectRatioName) || ASPECT_RATIOS[4];
-  const [canvasBackground, setCanvasBackground] = useState("linear-gradient(135deg, #667eea 0%, #764ba2 100%)");
+  const currentAspectRatio =
+    ASPECT_RATIOS.find((r) => r.name === aspectRatioName) || ASPECT_RATIOS[4];
+  const [canvasBackground, setCanvasBackground] = useState(
+    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+  );
 
   // --- Image State ---
   const [userImage, setUserImage] = useState<string | null>(null);
@@ -49,18 +52,17 @@ export default function EditorPage() {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
 
   // Default Text Styles
-  const [currentText, setCurrentText] = useState("Click to Edit");
+  const [currentText, setCurrentText] = useState("Sample Text");
   const [fontSize, setFontSize] = useState(48);
   const [fontFamily, setFontFamily] = useState("Inter");
-  const [fontWeight, setFontWeight] = useState("800");
+  const [fontWeight, setFontWeight] = useState("400");
   const [color, setColor] = useState("#ffffff");
   const [textShadow, setTextShadow] = useState("none");
   const [textBorderRadius, setTextBorderRadius] = useState(12);
-  const [textBackgroundColor, setTextBackgroundColor] = useState("#ffffff");
-  const [textPadding, setTextPadding] = useState(24);
+  const [textBackgroundColor, setTextBackgroundColor] = useState("#000000");
+  const [textPadding, setTextPadding] = useState(4);
   const [showTextBackground, setShowTextBackground] = useState(true);
 
-  // --- Export State ---
   const [exportFormat, setExportFormat] = useState("png");
   const [exportQuality, setExportQuality] = useState("2");
 
@@ -69,15 +71,25 @@ export default function EditorPage() {
   const [dragTarget, setDragTarget] = useState<string | "image" | null>(null);
 
   // --- History System ---
-  const [history, setHistory] = useState<HistoryState[]>([{
-    textElements: [],
-    canvasBackground: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    userImage: null,
-    userImageStyle: { scale: 90, borderRadius: 12, shadow: "none", rotate: 0, blur: 0, opacity: 100, noise: 0 },
-  }]);
+  const [history, setHistory] = useState<HistoryState[]>([
+    {
+      textElements: [],
+      canvasBackground: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      userImage: null,
+      userImageStyle: {
+        scale: 90,
+        borderRadius: 12,
+        shadow: "none",
+        rotate: 0,
+        blur: 0,
+        opacity: 100,
+        noise: 0,
+      },
+    },
+  ]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
-  // Debounced Save History (2 seconds)
+  // Debounced Save
   const queueHistorySave = useCallback(() => {
     if (historyTimeoutRef.current) {
       clearTimeout(historyTimeoutRef.current);
@@ -115,59 +127,124 @@ export default function EditorPage() {
     setHistoryIndex(newHistory.length - 1);
   };
 
-  // --- Modifiers ---
+  const resetCanvas = () => {
+    setUserImage(null);
+    setTextElements([]);
+    setCanvasBackground("linear-gradient(135deg, #667eea 0%, #764ba2 100%)");
+    setUserImageStyle({
+      scale: 90,
+      borderRadius: 12,
+      shadow: "none",
+      rotate: 0,
+      blur: 0,
+      opacity: 100,
+      noise: 0,
+    });
+    saveHistoryImmediate();
+    toast.success("Canvas reset!");
+  };
 
   const addTextElement = () => {
     const newElement: TextElement = {
       id: `text_${Date.now()}`,
-      content: "Double Click to Edit",
-      position: { x: currentAspectRatio.width / 2 - 100, y: currentAspectRatio.height / 2 },
+      content: "Sample Text",
+      position: {
+        x: currentAspectRatio.width / 2 - 100,
+        y: currentAspectRatio.height / 2,
+      },
       style: {
-        fontSize, fontFamily, fontWeight, color, textShadow,
-        borderRadius: textBorderRadius, backgroundColor: textBackgroundColor,
-        padding: textPadding, showBackground: showTextBackground,
+        fontSize,
+        fontFamily,
+        fontWeight,
+        color,
+        textShadow,
+        borderRadius: textBorderRadius,
+        backgroundColor: textBackgroundColor,
+        padding: textPadding,
+        showBackground: showTextBackground,
       },
     };
-    setTextElements(prev => [...prev, newElement]);
+    setTextElements((prev) => [...prev, newElement]);
     setSelectedElement(newElement.id);
     saveHistoryImmediate();
   };
 
-  const updateSelectedText = (updates: Partial<TextElement["style"]> | { content: string }) => {
+  const updateSelectedText = (
+    updates: Partial<TextElement["style"]> | { content: string }
+  ) => {
     if (!selectedElement) return;
-    setTextElements(prev => prev.map(el => {
-      if (el.id === selectedElement) {
-        if ("content" in updates) return { ...el, content: updates.content! };
-        return { ...el, style: { ...el.style, ...updates } };
-      }
-      return el;
-    }));
+    setTextElements((prev) =>
+      prev.map((el) => {
+        if (el.id === selectedElement) {
+          if ("content" in updates) return { ...el, content: updates.content! };
+          return { ...el, style: { ...el.style, ...updates } };
+        }
+        return el;
+      })
+    );
     queueHistorySave();
   };
 
   // Wrappers
-  const handleTextChange = (val: string) => selectedElement ? updateSelectedText({ content: val }) : setCurrentText(val);
-  const handleFontSize = (val: number) => selectedElement ? updateSelectedText({ fontSize: val }) : setFontSize(val);
-  const handleFontFamily = (val: string) => selectedElement ? updateSelectedText({ fontFamily: val }) : setFontFamily(val);
-  const handleFontWeight = (val: string) => selectedElement ? updateSelectedText({ fontWeight: val }) : setFontWeight(val);
-  const handleColor = (val: string) => selectedElement ? updateSelectedText({ color: val }) : setColor(val);
-  const handleShadow = (val: string) => selectedElement ? updateSelectedText({ textShadow: val }) : setTextShadow(val);
-  const handleTextRadius = (val: number) => selectedElement ? updateSelectedText({ borderRadius: val }) : setTextBorderRadius(val);
-  const handleTextBgColor = (val: string) => selectedElement ? updateSelectedText({ backgroundColor: val }) : setTextBackgroundColor(val);
-  const handleTextPadding = (val: number) => selectedElement ? updateSelectedText({ padding: val }) : setTextPadding(val);
-  const handleShowTextBg = (val: boolean) => selectedElement ? updateSelectedText({ showBackground: val }) : setShowTextBackground(val);
+  const handleTextChange = (val: string) =>
+    selectedElement
+      ? updateSelectedText({ content: val })
+      : setCurrentText(val);
+  const handleFontSize = (val: number) =>
+    selectedElement ? updateSelectedText({ fontSize: val }) : setFontSize(val);
+  const handleFontFamily = (val: string) =>
+    selectedElement
+      ? updateSelectedText({ fontFamily: val })
+      : setFontFamily(val);
+  const handleFontWeight = (val: string) =>
+    selectedElement
+      ? updateSelectedText({ fontWeight: val })
+      : setFontWeight(val);
+  const handleColor = (val: string) =>
+    selectedElement ? updateSelectedText({ color: val }) : setColor(val);
+  const handleShadow = (val: string) =>
+    selectedElement
+      ? updateSelectedText({ textShadow: val })
+      : setTextShadow(val);
+  const handleTextRadius = (val: number) =>
+    selectedElement
+      ? updateSelectedText({ borderRadius: val })
+      : setTextBorderRadius(val);
+  const handleTextBgColor = (val: string) =>
+    selectedElement
+      ? updateSelectedText({ backgroundColor: val })
+      : setTextBackgroundColor(val);
+  const handleTextPadding = (val: number) =>
+    selectedElement
+      ? updateSelectedText({ padding: val })
+      : setTextPadding(val);
+  const handleShowTextBg = (val: boolean) =>
+    selectedElement
+      ? updateSelectedText({ showBackground: val })
+      : setShowTextBackground(val);
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
-      setUserImage(e.target?.result as string);
-      saveHistoryImmediate();
+      const result = e.target?.result as string;
+
+      // Load image to determine natural size for centering
+      const img = new Image();
+      img.onload = () => {
+        const x = (currentAspectRatio.width - img.naturalWidth) / 2;
+        const y = (currentAspectRatio.height - img.naturalHeight) / 2;
+
+        setImagePosition({ x, y });
+        setUserImage(result);
+        saveHistoryImmediate();
+      };
+      img.src = result;
     };
     reader.readAsDataURL(file);
   };
 
   const handleImageStyleChange = (updates: Partial<ImageStyle>) => {
-    setUserImageStyle(prev => ({ ...prev, ...updates }));
+    setUserImageStyle((prev) => ({ ...prev, ...updates }));
     queueHistorySave();
   };
 
@@ -175,8 +252,6 @@ export default function EditorPage() {
     setCanvasBackground(val);
     queueHistorySave();
   };
-
-  // --- Interaction Handlers ---
 
   const handleElementMouseDown = (e: React.MouseEvent, elementId: string) => {
     e.preventDefault();
@@ -206,15 +281,15 @@ export default function EditorPage() {
     if (dragTarget === "image") {
       setImagePosition({ x, y });
     } else {
-      setTextElements(prev => prev.map(el => 
-        el.id === dragTarget ? { ...el, position: { x, y } } : el
-      ));
+      setTextElements((prev) =>
+        prev.map((el) =>
+          el.id === dragTarget ? { ...el, position: { x, y } } : el
+        )
+      );
     }
   };
 
   const handleMouseUp = () => setDragTarget(null);
-
-  // --- Undo / Redo ---
 
   const undo = () => {
     if (historyIndex > 0) {
@@ -237,24 +312,29 @@ export default function EditorPage() {
     setCanvasBackground(state.canvasBackground);
     setUserImage(state.userImage);
     setUserImageStyle(state.userImageStyle);
-    
+
     // Merge history (content/style) with current positions
-    setTextElements(currentElements => {
-      return state.textElements.map(histEl => {
-        const existing = currentElements.find(el => el.id === histEl.id);
+    setTextElements((currentElements) => {
+      return state.textElements.map((histEl) => {
+        const existing = currentElements.find((el) => el.id === histEl.id);
         return {
           ...histEl,
-          position: existing ? existing.position : { x: currentAspectRatio.width/2, y: currentAspectRatio.height/2 }
+          position: existing
+            ? existing.position
+            : {
+                x: currentAspectRatio.width / 2,
+                y: currentAspectRatio.height / 2,
+              },
         };
       });
     });
   };
 
-  // --- Export using Canvas API ---
+  // canvas export////////////////////////////////////////////////////////////////////////////////////
 
   const handleDownload = async () => {
     if (!canvasRef.current) return;
-    
+
     try {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -263,7 +343,7 @@ export default function EditorPage() {
       const scale = parseInt(exportQuality) || 2;
       canvas.width = currentAspectRatio.width * scale;
       canvas.height = currentAspectRatio.height * scale;
-      
+
       // Setup High Quality Scaling
       ctx.scale(scale, scale);
       ctx.imageSmoothingEnabled = true;
@@ -274,29 +354,42 @@ export default function EditorPage() {
         ctx.fillStyle = canvasBackground;
         ctx.fillRect(0, 0, currentAspectRatio.width, currentAspectRatio.height);
       } else if (canvasBackground.startsWith("linear-gradient")) {
-        // Approximate 135deg linear gradient
-        const gradient = ctx.createLinearGradient(0, 0, currentAspectRatio.width, currentAspectRatio.height);
-        // Simple regex to extract colors from the CSS gradient string
-        // Matches typical format like #rrggbb or rgb(...)
-        const colorMatches = canvasBackground.match(/(#[0-9a-fA-F]{6}|rgba?\(.*?\))/g);
-        
+        const gradient = ctx.createLinearGradient(
+          0,
+          0,
+          currentAspectRatio.width,
+          currentAspectRatio.height
+        );
+        const colorMatches = canvasBackground.match(
+          /(#[0-9a-fA-F]{6}|rgba?\(.*?\))/g
+        );
+
         if (colorMatches && colorMatches.length >= 2) {
           gradient.addColorStop(0, colorMatches[0]);
           gradient.addColorStop(1, colorMatches[1]);
-          if(colorMatches.length > 2) {
-             // Distribute middle colors if any
-             for(let i = 1; i < colorMatches.length - 1; i++) {
-                gradient.addColorStop(i / (colorMatches.length - 1), colorMatches[i]);
-             }
+          if (colorMatches.length > 2) {
+            for (let i = 1; i < colorMatches.length - 1; i++) {
+              gradient.addColorStop(
+                i / (colorMatches.length - 1),
+                colorMatches[i]
+              );
+            }
           }
+          ctx.fillStyle = gradient;
+          ctx.fillRect(
+            0,
+            0,
+            currentAspectRatio.width,
+            currentAspectRatio.height
+          );
         } else {
-           // Fallback
-           ctx.fillStyle = "#ffffff"; 
-        }
-        
-        if (colorMatches && colorMatches.length >= 2) {
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, currentAspectRatio.width, currentAspectRatio.height);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(
+            0,
+            0,
+            currentAspectRatio.width,
+            currentAspectRatio.height
+          );
         }
       }
 
@@ -306,140 +399,116 @@ export default function EditorPage() {
         img.crossOrigin = "anonymous";
         img.src = userImage;
         await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
+          img.onload = resolve;
+          img.onerror = reject;
         });
 
         ctx.save();
-        
-        // Calculate dimensions - imitating object-contain logic within the bounds
-        // In Canvas.tsx, maxWidth/MaxHeight is 90% of container
-        // We use userImageStyle.scale to scale relative to natural size? 
-        // No, in Canvas.tsx it uses transform scale.
-        // We need to approximate the visual result.
-        
-        // Using the image position x,y directly
+
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
         const x = imagePosition.x;
         const y = imagePosition.y;
-        
-        // Initial drawing size based on scale
-        // NOTE: In HTML renderer, scale=100 means native size? 
-        // Or relative to parent? The <img> is mostly controlled by CSS transform scale.
-        const drawWidth = img.naturalWidth * (userImageStyle.scale / 100);
-        const drawHeight = img.naturalHeight * (userImageStyle.scale / 100);
 
-        // Move to center of image for rotation
-        ctx.translate(x + drawWidth / 2, y + drawHeight / 2);
+        ctx.translate(x + w / 2, y + h / 2);
+
         ctx.rotate((userImageStyle.rotate * Math.PI) / 180);
-        ctx.translate(-(x + drawWidth / 2), -(y + drawHeight / 2));
+        ctx.scale(userImageStyle.scale / 100, userImageStyle.scale / 100);
 
-        // Filters
+        ctx.translate(-(w / 2), -(h / 2));
+
         ctx.globalAlpha = userImageStyle.opacity / 100;
         if (userImageStyle.blur > 0) {
-            ctx.filter = `blur(${userImageStyle.blur}px)`;
-        }
-        
-        // Shadow
-        if (userImageStyle.shadow !== 'none') {
-            // Rough mapping of presets to canvas shadow
-            ctx.shadowColor = "rgba(0,0,0,0.2)";
-            if(userImageStyle.shadow.includes("10px")) ctx.shadowBlur = 15;
-            else if(userImageStyle.shadow.includes("20px")) ctx.shadowBlur = 25;
-            else ctx.shadowBlur = 5;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 4;
+          ctx.filter = `blur(${userImageStyle.blur}px)`;
         }
 
-        // Rounded Corners (Clipping)
+        if (userImageStyle.shadow !== "none") {
+          ctx.shadowColor = "rgba(0,0,0,0.2)";
+          if (userImageStyle.shadow.includes("10px")) ctx.shadowBlur = 15;
+          else if (userImageStyle.shadow.includes("20px")) ctx.shadowBlur = 25;
+          else ctx.shadowBlur = 5;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 4;
+        }
+
         if (userImageStyle.borderRadius > 0) {
-            ctx.beginPath();
-            // check for roundRect support or polyfill
-            if (ctx.roundRect) {
-                ctx.roundRect(x, y, drawWidth, drawHeight, userImageStyle.borderRadius);
-            } else {
-                ctx.rect(x, y, drawWidth, drawHeight); // Fallback
-            }
-            ctx.clip();
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(0, 0, w, h, userImageStyle.borderRadius);
+          } else {
+            ctx.rect(0, 0, w, h);
+          }
+          ctx.clip();
         }
 
-        ctx.drawImage(img, x, y, drawWidth, drawHeight);
+        // Draw at 0,0 relative to the translated context (which is effectively x,y unrotated)
+        ctx.drawImage(img, 0, 0, w, h);
         ctx.restore();
       }
 
       // 3. Draw Text Elements
       textElements.forEach((el) => {
         ctx.save();
-        
-        // Parse font string
-        // Note: Font loading might be an issue if using custom web fonts not installed on system
-        // But for standard fonts it works.
         const fontSizeVal = el.style.fontSize;
         ctx.font = `${el.style.fontWeight} ${fontSizeVal}px ${el.style.fontFamily}, sans-serif`;
-        ctx.textBaseline = "top"; // Matches HTML default better usually
+        ctx.textBaseline = "top";
 
-        const lines = el.content.split('\n');
-        const lineHeight = fontSizeVal * 1.2; 
-        
-        // Simple measure for background box
+        const lines = el.content.split("\n");
+        const lineHeight = fontSizeVal * 1.2;
+
         let maxWidth = 0;
-        lines.forEach(line => {
-            const m = ctx.measureText(line);
-            if (m.width > maxWidth) maxWidth = m.width;
+        lines.forEach((line) => {
+          const m = ctx.measureText(line);
+          if (m.width > maxWidth) maxWidth = m.width;
         });
         const totalHeight = lines.length * lineHeight;
         const padding = el.style.padding;
 
-        // Draw Background Box
         if (el.style.showBackground) {
-            ctx.fillStyle = el.style.backgroundColor;
-            const bgX = el.position.x;
-            const bgY = el.position.y;
-            const bgW = maxWidth + (padding * 2);
-            const bgH = totalHeight + (padding * 2) - (lineHeight - fontSizeVal); // Adjustment
-            
-            // We need to account that text draws at x,y + padding
-            // Let's assume el.position is top-left of the CONTAINER (div)
-            
-            ctx.beginPath();
-            if (ctx.roundRect) {
-                ctx.roundRect(bgX, bgY, bgW, bgH, el.style.borderRadius);
-            } else {
-                ctx.rect(bgX, bgY, bgW, bgH);
-            }
-            ctx.fill();
+          ctx.fillStyle = el.style.backgroundColor;
+          const bgX = el.position.x;
+          const bgY = el.position.y;
+          const bgW = maxWidth + padding * 2;
+          const bgH = totalHeight + padding * 2 - (lineHeight - fontSizeVal);
+
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(bgX, bgY, bgW, bgH, el.style.borderRadius);
+          } else {
+            ctx.rect(bgX, bgY, bgW, bgH);
+          }
+          ctx.fill();
         }
 
-        // Draw Text
         ctx.fillStyle = el.style.color;
-        
-        // Text Shadow
-        if (el.style.textShadow !== 'none') {
-             ctx.shadowColor = "rgba(0,0,0,0.3)";
-             ctx.shadowBlur = 4;
-             ctx.shadowOffsetX = 2;
-             ctx.shadowOffsetY = 2;
+
+        if (el.style.textShadow !== "none") {
+          ctx.shadowColor = "rgba(0,0,0,0.3)";
+          ctx.shadowBlur = 4;
+          ctx.shadowOffsetX = 2;
+          ctx.shadowOffsetY = 2;
         }
 
         let textY = el.position.y + (el.style.showBackground ? padding : 0);
         const textX = el.position.x + (el.style.showBackground ? padding : 0);
 
         lines.forEach((line) => {
-            ctx.fillText(line, textX, textY);
-            textY += lineHeight;
+          ctx.fillText(line, textX, textY);
+          textY += lineHeight;
         });
 
         ctx.restore();
       });
 
       // 4. Download
-      const mimeType = exportFormat === 'jpeg' ? 'image/jpeg' : 'image/png';
-      const dataUrl = canvas.toDataURL(mimeType, 0.95);
-      
-      const link = document.createElement('a');
+      const mimeType = exportFormat === "jpeg" ? "image/jpeg" : "image/png";
+      const dataUrl = canvas.toDataURL(mimeType, 1);
+
+      const link = document.createElement("a");
       link.download = `plator-export.${exportFormat}`;
       link.href = dataUrl;
       link.click();
-      
+
       toast.success("Exported successfully!");
     } catch (error) {
       console.error(error);
@@ -450,16 +519,27 @@ export default function EditorPage() {
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden">
       {/* Left Panel */}
-      <div className="w-80 shrink-0 border-r border-border bg-card flex flex-col z-20 shadow-xl h-full">
-        <div className="h-12 border-b border-border flex items-center justify-between px-3 shrink-0">
+      <div className="w-80 shrink-0 border-r-2 bg-card flex flex-col z-20 shadow-xl h-full">
+        <div className="h-12 border-b-2 flex items-center justify-between px-3 shrink-0">
           <Link href="/">
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-md"
+            >
               <ArrowLeft size={16} />
             </Button>
           </Link>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground rounded-md" asChild>
-              <Link href="https://x.com/kuzuri247" target="_blank"><Twitter size={16} /></Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground rounded-md"
+              asChild
+            >
+              <Link href="https://x.com/kuzuri247" target="_blank">
+                <Twitter size={16} />
+              </Link>
             </Button>
             <ThemeToggle />
           </div>
@@ -468,7 +548,9 @@ export default function EditorPage() {
         <ScrollArea className="flex-1">
           <div className="p-4">
             <LeftPanel
-              selectedElement={textElements.find(el => el.id === selectedElement)}
+              selectedElement={textElements.find(
+                (el) => el.id === selectedElement
+              )}
               currentText={currentText}
               fontSize={fontSize}
               fontFamily={fontFamily}
@@ -495,12 +577,14 @@ export default function EditorPage() {
               onImageUpload={handleImageUpload}
             />
             {/* Hidden Input for Canvas Click Upload */}
-            <input 
-                ref={hiddenInputRef}
-                type="file" 
-                accept="image/*" 
-                onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
-                className="hidden"
+            <input
+              ref={hiddenInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                e.target.files?.[0] && handleImageUpload(e.target.files[0])
+              }
+              className="hidden"
             />
           </div>
         </ScrollArea>
@@ -508,7 +592,7 @@ export default function EditorPage() {
 
       {/* Canvas Area */}
       <div className="flex-1 relative bg-muted/20 flex flex-col min-w-0 overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(#ababab_2px,transparent_1px)] [background-size:20px_20px]" />
+        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(#ababab_2px,transparent_1px)] bg-size-[20px_20px]" />
         <div className="flex-1 flex items-center justify-center p-8 overflow-hidden z-10">
           <div className="transition-transform duration-200 ease-out scale-[0.5] sm:scale-[0.6] md:scale-[0.75] lg:scale-[0.85] xl:scale-100 origin-center">
             <Canvas
@@ -526,19 +610,54 @@ export default function EditorPage() {
               onElementMouseDown={handleElementMouseDown}
               onMouseMove={handleCanvasMouseMove}
               onMouseUp={handleMouseUp}
-              onUndo={undo}
-              onRedo={redo}
-              canUndo={historyIndex > 0}
-              canRedo={historyIndex < history.length - 1}
             />
+          </div>
+        </div>
+
+        {/* absolute actions  */}
+        <div className="absolute bottom-6 left-6 flex items-center gap-2 z-50">
+          <div className="bg-background/80 backdrop-blur border-2 rounded-md p-1 shadow-lg flex items-center gap-1">
+            <Button
+              onClick={undo}
+              disabled={historyIndex <= 0}
+              variant="ghost"
+              size="icon"
+              className="rounded-full w-8 h-8 hover:bg-neutral-300 dark:hover:bg-neutral-700"
+              title="Undo"
+            >
+              <Undo2 />
+            </Button>
+            <Button
+              onClick={redo}
+              disabled={historyIndex >= history.length - 1}
+              variant="ghost"
+              size="icon"
+              className="rounded-full w-8 h-8 hover:bg-neutral-300 dark:hover:bg-neutral-700"
+              title="Redo"
+            >
+              <Redo2 />
+            </Button>
+
+            <div className="w-px h-4 bg-border mx-1" />
+            <Button
+              onClick={resetCanvas}
+              variant="ghost"
+              size="icon"
+              className="rounded-full w-8 h-8 hover:bg-muted text-destructive hover:text-destructive"
+              title="Reset Canvas"
+            >
+              <RotateCcw />
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Right Panel */}
-      <div className="w-80 shrink-0 border-l border-border bg-card flex flex-col z-20 shadow-xl h-full">
-        <div className="h-12 border-b border-border flex items-center px-4 shrink-0 bg-transparent">
-          <span className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Canvas & Export</span>
+      <div className="w-80 shrink-0 border-2 bg-card flex flex-col z-20 shadow-xl h-full">
+        <div className="h-12 border-b-2 flex items-center px-4 shrink-0 bg-transparent">
+          <span className="font-bold text-xs uppercase tracking-widest text-muted-foreground">
+            Canvas & Export
+          </span>
         </div>
         <div className="flex-1 min-h-0">
           <div className="p-5 h-full">

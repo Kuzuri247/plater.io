@@ -12,18 +12,7 @@ import {
 } from "@/components/ui/select";
 import { BACKGROUND_OPTIONS, ASPECT_RATIOS } from "./types";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-interface RightPanelProps {
-  canvasBackground: string;
-  aspectRatio: string;
-  exportFormat: string;
-  exportQuality: string;
-  onCanvasBackgroundChange: (value: string) => void;
-  onAspectRatioChange: (value: string) => void;
-  onExportFormatChange: (value: string) => void;
-  onExportQualityChange: (value: string) => void;
-  onDownload: () => void;
-}
+import { RightPanelProps } from "./types";
 
 export function RightPanel({
   canvasBackground,
@@ -45,10 +34,10 @@ export function RightPanel({
           <span className="text-foreground">Canvas Size</span>
         </div>
         <Select value={aspectRatio} onValueChange={onAspectRatioChange}>
-          <SelectTrigger className="h-10 w-full bg-background/50">
+          <SelectTrigger className="h-10 w-full bg-background/50 font-manrope">
             <SelectValue placeholder="Select Size" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="font-manrope">
             {ASPECT_RATIOS.map((ratio) => (
               <SelectItem key={ratio.name} value={ratio.name} className="py-3">
                 <div className="flex items-center gap-3">
@@ -103,7 +92,7 @@ export function RightPanel({
           </Label>
           <div className="grid grid-cols-2 gap-3">
             <Select value={exportFormat} onValueChange={onExportFormatChange}>
-              <SelectTrigger className="h-8 bg-transparent">
+              <SelectTrigger className="h-8 bg-transparent font-manrope">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -112,7 +101,7 @@ export function RightPanel({
               </SelectContent>
             </Select>
             <Select value={exportQuality} onValueChange={onExportQualityChange}>
-              <SelectTrigger className="h-8 bg-transparent">
+              <SelectTrigger className="h-8 bg-transparent font-manrope">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

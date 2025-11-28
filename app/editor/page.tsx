@@ -140,7 +140,27 @@ export default function EditorPage() {
       opacity: 100,
       noise: 0,
     });
-    saveHistoryImmediate();
+
+    const initialState: HistoryState = {
+      textElements: [],
+      canvasBackground: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      userImage: null,
+      userImageStyle: {
+        scale: 90,
+        borderRadius: 12,
+        shadow: "none",
+        rotate: 0,
+        blur: 0,
+        opacity: 100,
+        noise: 0,
+      },
+    };
+
+
+    setHistory([initialState]);
+    
+    setHistoryIndex(0);
+    
     toast.success("Canvas reset!");
   };
 
@@ -616,7 +636,7 @@ export default function EditorPage() {
 
         {/* absolute actions  */}
         <div className="absolute bottom-6 left-6 flex items-center gap-2 z-50">
-          <div className="bg-background/80 backdrop-blur border-2 rounded-md p-1 shadow-lg flex items-center gap-1">
+          <div className="bg-background/80 backdrop-blur border-2 rounded-full p-1 shadow-lg flex items-center gap-1">
             <Button
               onClick={undo}
               disabled={historyIndex <= 0}

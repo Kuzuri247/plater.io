@@ -3,27 +3,38 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("light");
 
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
+    const root = document.documentElement;
+    
+    if (root.classList.contains("dark")) {
+      setTheme("dark");
+    } else if (root.classList.contains("light")) {
+      setTheme("light");
     } else {
-      document.documentElement.classList.remove("dark");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
     }
-  }, [isDark]);
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("dark", "light");
+    root.classList.add(theme);
+  }, [theme]);
 
   return (
     <button
-      onClick={() => setIsDark(!isDark)}
+      onClick={() => setTheme(prev => prev === "dark" ? "light" : "dark")}
       className={cn(
         "text-muted-foreground hover:text-foreground p-2",
         "transition-all duration-300 ease-in-out",
-        isDark ? "rotate-180" : "rotate-0"
+        theme === "dark" ? "rotate-0" : "rotate-180"
       )}
-      aria-label="Toggle Theme"
+      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >
-      {isDark ? <Sun size={16} /> : <Moon size={16} />}
+      {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
     </button>
   );
 }

@@ -32,19 +32,8 @@ import {
   FONT_WEIGHTS,
   SHADOW_PRESETS,
   LeftPanelProps,
+  CLIP_PATHS,
 } from "./types";
-
-const CLIP_PATHS = [
-  { name: "None", value: "none" },
-  { name: "Circle", value: "circle(50% at 50% 50%)" },
-  { name: "Ellipse", value: "ellipse(50% 50% at 50% 50%)" },
-  { name: "Triangle", value: "polygon(50% 0%, 0% 100%, 100% 100%)" },
-  { name: "Diamond", value: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)" },
-  {
-    name: "Pentagon",
-    value: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)",
-  },
-];
 
 export function LeftPanel({
   selectedTextElement,
@@ -118,11 +107,11 @@ export function LeftPanel({
         <div className="px-4 pt-4 shrink-0">
           <TabsList className="w-full grid grid-cols-2 dark:bg-neutral-800">
             <TabsTrigger value="image">
-              <ImageIcon className="w-4 h-4 mr-2 " />
+              <ImageIcon className="size-4 mr-2 " />
               Images
             </TabsTrigger>
             <TabsTrigger value="text">
-              <Type className="w-4 h-4 mr-2 " />
+              <Type className="size-4 mr-2 " />
               Text
             </TabsTrigger>
           </TabsList>
@@ -372,33 +361,10 @@ export function LeftPanel({
 
                         {/* Flip & Crop */}
                         <div className="space-y-4">
-                          <div className="flex gap-2">
-                            <Button
-                              variant={imgStyle.flipX ? "default" : "outline"}
-                              size="sm"
-                              className="flex-1"
-                              onClick={() =>
-                                onImageStyleChange({ flipX: !imgStyle.flipX })
-                              }
-                            >
-                              <FlipHorizontal className="w-4 h-4 mr-2" /> Flip X
-                            </Button>
-                            <Button
-                              variant={imgStyle.flipY ? "default" : "outline"}
-                              size="sm"
-                              className="flex-1"
-                              onClick={() =>
-                                onImageStyleChange({ flipY: !imgStyle.flipY })
-                              }
-                            >
-                              <FlipVertical className="w-4 h-4 mr-2" /> Flip Y
-                            </Button>
-                          </div>
-
                           <div className="space-y-3 pt-2 font-manrope">
                             <div className="flex items-center justify-between">
                               <Label className="text-xs font-medium flex items-center gap-2">
-                                <Scissors className="w-3 h-3" /> Manual Crop (%)
+                                <Scissors className="size-3" /> Manual Crop (%)
                               </Label>
                               <Button
                                 variant="ghost"
@@ -407,7 +373,7 @@ export function LeftPanel({
                                 onClick={resetCrop}
                                 title="Reset Crop"
                               >
-                                <RotateCcw className="w-3 h-3" />
+                                <RotateCcw className="size-3" />
                               </Button>
                             </div>
 
@@ -475,7 +441,7 @@ export function LeftPanel({
                         {/* Clipping Controls */}
                         <div className="space-y-2 font-manrope pt-2">
                           <Label className="text-xs font-medium flex items-center gap-2 font-manrope">
-                            <BoxSelect className="w-3 h-3" /> Shape Clip
+                            <BoxSelect className="size-3" /> Shape Clip
                           </Label>
                           <Select
                             value={imgStyle.clipPath}

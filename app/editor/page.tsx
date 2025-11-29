@@ -70,10 +70,18 @@ export default function EditorPage() {
   const [showTextBackground, setShowTextBackground] = useState(true);
 
   const [exportFormat, setExportFormat] = useState("png");
+  ///////////////////////////////////////////////////////////////////////////////////
   const [exportQuality, setExportQuality] = useState("2");
+  ///////////////////////////////////////////////////////////////////////////////////
 
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [dragTarget, setDragTarget] = useState<string | null>(null);
+
+  const elementsRef = useRef({ imageElements: [] as ImageElement[], textElements: [] as TextElement[] });
+
+  useEffect(() => {
+    elementsRef.current = { imageElements, textElements };
+  }, [imageElements, textElements]);
 
   const [history, setHistory] = useState<HistoryState[]>([
     {
@@ -276,33 +284,34 @@ export default function EditorPage() {
     queueHistorySave();
   };
 
-  // --- UPDATED DRAG START ---
-  const handleElementMouseDown = (e: React.MouseEvent, elementId: string) => {
+  // --- STABILIZED DRAG START ---
+  // Wrapped in useCallback with minimal dependencies
+  const handleElementMouseDown = useCallback((e: React.MouseEvent, elementId: string) => {
     e.preventDefault();
     e.stopPropagation();
-
-    // Get the current visual scale factor of the canvas
+    
     const scale = getCanvasScale();
-    const element =
-      imageElements.find((el) => el.id === elementId) ||
-      textElements.find((el) => el.id === elementId);
-
+    
+    // Read from REF instead of STATE to avoid re-creating this function on every render
+    const { imageElements, textElements } = elementsRef.current;
+    
+    const element = imageElements.find(el => el.id === elementId) || textElements.find(el => el.id === elementId);
+    
     if (!element || !canvasRef.current) return;
 
     const canvasRect = canvasRef.current.getBoundingClientRect();
-
-    // Calculate position in Canvas Units (Visual Pixels / Scale Factor)
+    
     const mouseXInCanvas = (e.clientX - canvasRect.left) / scale;
     const mouseYInCanvas = (e.clientY - canvasRect.top) / scale;
 
     setDragOffset({
       x: mouseXInCanvas - element.position.x,
-      y: mouseYInCanvas - element.position.y,
+      y: mouseYInCanvas - element.position.y
     });
-
+    
     setDragTarget(elementId);
     setSelectedElementId(elementId);
-  };
+  }, [getCanvasScale]); // Only depends on getCanvasScale (which is also stable)
 
   // --- UPDATED DRAG MOVE ---
   const handleCanvasMouseMove = (e: React.MouseEvent) => {

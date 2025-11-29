@@ -162,7 +162,6 @@ export const BACKGROUND_OPTIONS = [
   { name: "Citrus", value: "linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%)" },
 ];
 
-
 export interface RightPanelProps {
   canvasBackground: string;
   aspectRatio: string;

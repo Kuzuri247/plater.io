@@ -76,6 +76,7 @@ export default function EditorPage() {
 
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [dragTarget, setDragTarget] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const elementsRef = useRef({ imageElements: [] as ImageElement[], textElements: [] as TextElement[] });
 
@@ -311,6 +312,7 @@ export default function EditorPage() {
     
     setDragTarget(elementId);
     setSelectedElementId(elementId);
+    setIsDragging(true);
   }, [getCanvasScale]); // Only depends on getCanvasScale (which is also stable)
 
   // --- UPDATED DRAG MOVE ---
@@ -342,7 +344,10 @@ export default function EditorPage() {
     }
   };
 
-  const handleMouseUp = () => setDragTarget(null);
+  const handleMouseUp = () => {
+  setDragTarget(null);
+  setIsDragging(false); // Add this
+};
 
   const undo = () => {
     if (historyIndex > 0) {
@@ -517,6 +522,7 @@ export default function EditorPage() {
               onElementMouseDown={handleElementMouseDown}
               onMouseMove={handleCanvasMouseMove}
               onMouseUp={handleMouseUp}
+              isDragging={isDragging} 
             />
           </div>
         </div>

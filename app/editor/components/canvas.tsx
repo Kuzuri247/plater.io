@@ -5,18 +5,19 @@ import { Card } from "@/components/ui/card";
 import { Image as ImageIcon } from "lucide-react";
 import { TextElement, ImageElement } from "./types";
 
-// Memoized image layer
+// Memoized image layer with enhanced 3D
 const ImageLayer = memo(
   ({
     img,
     isSelected,
+    isDragging,
     onMouseDown,
   }: {
     img: ImageElement;
     isSelected: boolean;
+    isDragging: boolean;
     onMouseDown: (e: React.MouseEvent, id: string) => void;
   }) => {
-    // Shadow Logic
     const hasCrop =
       img.style.crop.top > 0 ||
       img.style.crop.right > 0 ||
@@ -31,35 +32,39 @@ const ImageLayer = memo(
       clipStyle = `inset(${img.style.crop.top}% ${img.style.crop.right}% ${img.style.crop.bottom}% ${img.style.crop.left}%)`;
     }
 
+    // Calculate if element has 3D rotation
+    const has3DRotation = img.style.rotateX !== 0 || img.style.rotateY !== 0;
+
     return (
       <div
-        className={`absolute cursor-move transition-transform duration-75 ease-linear hover:ring-1 hover:ring-white/30 ${
+        className={`absolute cursor-move transition-transform ${
+          isDragging ? "duration-0" : "duration-100"
+        } ease-out hover:ring-1 hover:ring-white/30 ${
           isSelected ? "ring-2 ring-primary z-20" : "z-10"
         }`}
         onMouseDown={(e) => onMouseDown(e, img.id)}
         style={{
           left: img.position.x,
           top: img.position.y,
-          // Only add will-change when selected for better performance
-          willChange: isSelected ? "transform" : undefined,
-          // transform3d for GPU acceleration
+          willChange: isSelected || isDragging ? "transform" : undefined,
+          // Enhanced 3D transform
+          transformStyle: "preserve-3d",
           transform: `
-          translate3d(0, 0, 0)
-          perspective(1000px) 
-          rotateX(${img.style.rotateX}deg) 
-          rotateY(${img.style.rotateY}deg) 
-          rotateZ(${img.style.rotate}deg) 
-          scale3d(${img.style.scale / 100}, ${img.style.scale / 100}, 1)
-          scaleX(${img.style.flipX ? -1 : 1})
-          scaleY(${img.style.flipY ? -1 : 1})
-        `,
+            perspective(${has3DRotation ? 2000 : 1500}px) 
+            rotateX(${img.style.rotateX}deg) 
+            rotateY(${img.style.rotateY}deg) 
+            rotateZ(${img.style.rotate}deg) 
+            scale3d(${img.style.scale / 100}, ${img.style.scale / 100}, 1)
+            scaleX(${img.style.flipX ? -1 : 1})
+            scaleY(${img.style.flipY ? -1 : 1})
+            translateZ(${isSelected ? 20 : 0}px)
+          `,
           borderRadius: `${img.style.borderRadius}px`,
           boxShadow: img.style.shadow === "none" ? "none" : img.style.shadow,
           opacity: img.style.opacity / 100,
-          filter: `blur(${img.style.blur}px)`,
+          filter: `blur(${img.style.blur}px) ${isSelected ? "brightness(1.03)" : ""}`,
           clipPath: clipStyle,
-          // Add performance optimizations
-          backfaceVisibility: "hidden",
+          backfaceVisibility: has3DRotation ? "visible" : "hidden",
           contain: "layout style paint",
         }}
       >
@@ -93,42 +98,43 @@ const ImageLayer = memo(
     );
   },
   (prev, next) => {
-    // Optimized comparison
     return (
       prev.img.id === next.img.id &&
       prev.img.position.x === next.img.position.x &&
       prev.img.position.y === next.img.position.y &&
       prev.img.style === next.img.style &&
-      prev.isSelected === next.isSelected
+      prev.isSelected === next.isSelected &&
+      prev.isDragging === next.isDragging
     );
   }
 );
 ImageLayer.displayName = "ImageLayer";
 
-// Memoized Text Layer
+// Memoized Text Layer with 3D depth
 const TextLayer = memo(
   ({
     element,
     isSelected,
+    isDragging,
     onMouseDown,
   }: {
     element: TextElement;
     isSelected: boolean;
+    isDragging: boolean;
     onMouseDown: (e: React.MouseEvent, id: string) => void;
   }) => {
     return (
       <div
-        className={`absolute cursor-move select-none hover:ring-1 hover:ring-white/50 transition-shadow ${
-          isSelected ? "ring-2 ring-primary z-50" : "z-30"
-        }`}
+        className={`absolute cursor-move select-none hover:ring-1 hover:ring-white/50 transition-all ${
+          isDragging ? "duration-0" : "duration-100"
+        } ${isSelected ? "ring-2 ring-primary z-50" : "z-30"}`}
         onMouseDown={(e) => onMouseDown(e, element.id)}
         style={{
           left: element.position.x,
           top: element.position.y,
-          // Only add will-change when selected
-          willChange: isSelected ? "transform, left, top" : undefined,
-          // Add GPU acceleration
-          transform: "translate3d(0, 0, 0)",
+          willChange: isSelected || isDragging ? "transform, left, top" : undefined,
+          transformStyle: "preserve-3d",
+          transform: `translateZ(${isSelected ? 30 : 10}px)`,
           fontSize: element.style.fontSize,
           fontFamily: element.style.fontFamily,
           fontWeight: element.style.fontWeight,
@@ -140,9 +146,9 @@ const TextLayer = memo(
           borderRadius: `${element.style.borderRadius}px`,
           padding: `${element.style.padding}px`,
           lineHeight: 1.2,
-          // Add performance optimizations
           backfaceVisibility: "hidden",
           contain: "layout style paint",
+          filter: isSelected ? "brightness(1.03)" : "none",
         }}
       >
         {element.content}
@@ -150,14 +156,14 @@ const TextLayer = memo(
     );
   },
   (prev, next) => {
-    // Optimized comparison
     return (
       prev.element.id === next.element.id &&
       prev.element.position.x === next.element.position.x &&
       prev.element.position.y === next.element.position.y &&
       prev.element.style === next.element.style &&
       prev.element.content === next.element.content &&
-      prev.isSelected === next.isSelected
+      prev.isSelected === next.isSelected &&
+      prev.isDragging === next.isDragging
     );
   }
 );
@@ -174,6 +180,7 @@ interface EditorCanvasProps {
   onElementMouseDown: (e: React.MouseEvent, elementId: string) => void;
   onMouseMove: (e: React.MouseEvent) => void;
   onMouseUp: () => void;
+  isDragging: boolean;
 }
 
 export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
@@ -189,10 +196,10 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
       onElementMouseDown,
       onMouseMove,
       onMouseUp,
+      isDragging,
     },
     ref
   ) => {
-    // Memoize callbacks to prevent child re-renders
     const handleEmptyClick = useCallback(() => {
       onEmptyClick();
     }, [onEmptyClick]);
@@ -206,15 +213,15 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
             width: width,
             height: height,
             background: canvasBackground,
-            // Add performance hints
+            transformStyle: "preserve-3d",
+            perspective: "2500px",
+            perspectiveOrigin: "center center",
             contain: "layout style",
-            willChange: "background",
           }}
           onMouseMove={onMouseMove}
           onMouseUp={onMouseUp}
           onMouseLeave={onMouseUp}
         >
-          {/* Fallback if no images */}
           {imageElements.length === 0 && (
             <div
               onClick={handleEmptyClick}
@@ -232,6 +239,7 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
               key={img.id}
               img={img}
               isSelected={selectedElement === img.id}
+              isDragging={isDragging && selectedElement === img.id}
               onMouseDown={onElementMouseDown}
             />
           ))}
@@ -241,6 +249,7 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
               key={element.id}
               element={element}
               isSelected={selectedElement === element.id}
+              isDragging={isDragging && selectedElement === element.id}
               onMouseDown={onElementMouseDown}
             />
           ))}

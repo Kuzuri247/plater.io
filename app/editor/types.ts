@@ -37,7 +37,7 @@ export interface TextStyle {
   backgroundColor: string;
   padding: number;
   showBackground: boolean;
-  textEffect: string;
+  textEffect: string[]; 
 }
 
 export interface TextElement {
@@ -49,9 +49,9 @@ export interface TextElement {
 
 export interface LeftPanelProps {
   selectedTextElement: TextElement | undefined;
-  selectedImageElement: ImageElement | undefined; // Changed from just 'userImageStyle'
+  selectedImageElement: ImageElement | undefined;
 
-  // Text State (Keep these or refactor to use selectedTextElement directly, keeping simple for now)
+  // Text State
   currentText: string;
   fontSize: number;
   fontFamily: string;
@@ -62,7 +62,7 @@ export interface LeftPanelProps {
   textBackgroundColor: string;
   textPadding: number;
   showTextBackground: boolean;
-  textEffect: string;
+  textEffect: string[]; // Changed to array
 
   // Handlers
   onTextChange: (value: string) => void;
@@ -75,8 +75,9 @@ export interface LeftPanelProps {
   onTextBackgroundColorChange: (value: string) => void;
   onTextPaddingChange: (value: number) => void;
   onShowTextBackgroundChange: (value: boolean) => void;
-  onTextEffectChange: (value: string) => void;
+  onTextEffectChange: (value: string[]) => void; // Changed to array
   onAddText: () => void;
+
   onImageStyleChange: (updates: Partial<ImageStyle>) => void;
   onImageUpload: (file: File) => void;
 }
@@ -111,11 +112,13 @@ export const FONT_WEIGHTS = [
 ];
 
 export const TEXT_EFFECTS = [
-  { name: "None", value: "none" },
   { name: "Outline", value: "outline" },
   { name: "Underline", value: "underline" },
   { name: "Strikethrough", value: "line-through" },
   { name: "Italic", value: "italic" },
+  { name: "Uppercase", value: "uppercase" },   // Added
+  { name: "Small Caps", value: "small-caps" }, // Added
+  { name: "Blur", value: "blur" },
 ];
 
 export const CLIP_PATHS = [
@@ -171,18 +174,6 @@ export const BACKGROUND_OPTIONS = [
   { name: "Royal", value: "linear-gradient(135deg, #141e30 0%, #243b55 100%)" },
   { name: "Citrus", value: "linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%)" },
 ];
-
-export interface RightPanelProps {
-  canvasBackground: string;
-  aspectRatio: string;
-  exportFormat: string;
-  exportQuality: string;
-  onCanvasBackgroundChange: (value: string) => void;
-  onAspectRatioChange: (value: string) => void;
-  onExportFormatChange: (value: string) => void;
-  onExportQualityChange: (value: string) => void;
-  onDownload: () => void;
-}
 
 export const DEFAULT_IMAGE_STYLE: ImageStyle = {
   scale: 100,

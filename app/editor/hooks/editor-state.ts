@@ -35,7 +35,8 @@ export function useEditorState() {
   const [textBackgroundColor, setTextBackgroundColor] = useState("#000000");
   const [textPadding, setTextPadding] = useState(4);
   const [showTextBackground, setShowTextBackground] = useState(true);
-  const [textEffect, setTextEffect] = useState("None");
+  
+  const [textEffect, setTextEffect] = useState<string[]>([]);
 
   const [history, setHistory] = useState<HistoryState[]>([
     {
@@ -118,7 +119,7 @@ export function useEditorState() {
     saveHistoryImmediate();
   };
 
-  const handleTextEffect = (val: string) =>
+  const handleTextEffect = (val: string[]) =>
     selectedElementId?.startsWith("text")
       ? updateSelectedText({ textEffect: val })
       : setTextEffect(val);

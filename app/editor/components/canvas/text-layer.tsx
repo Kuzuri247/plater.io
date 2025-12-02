@@ -15,6 +15,47 @@ export const TextLayer = memo(
     isDragging: boolean;
     onMouseDown: (e: React.MouseEvent, id: string) => void;
   }) => {
+    // Helper to apply effects
+    const getEffectStyles = () => {
+      const effects = element.style.textEffect || [];
+      const baseColor = element.style.color;
+      
+      const styles: React.CSSProperties = {};
+
+      if (effects.includes("outline")) {
+        styles.color = "transparent";
+        styles.WebkitTextStroke = `1px ${baseColor}`;
+      }
+      
+      const decorations = [];
+      if (effects.includes("underline")) decorations.push("underline");
+      if (effects.includes("line-through")) decorations.push("line-through");
+      
+      if (decorations.length > 0) {
+        styles.textDecoration = decorations.join(" ");
+      }
+
+      if (effects.includes("italic")) {
+        styles.fontStyle = "italic";
+      }
+
+      // --- NEW EFFECTS ---
+      if (effects.includes("uppercase")) {
+        styles.textTransform = "uppercase";
+      }
+
+      if (effects.includes("small-caps")) {
+        styles.fontVariant = "small-caps";
+      }
+
+      if (effects.includes("blur")) {
+        styles.filter = "blur(2px)"; // Adds a soft blur effect
+      }
+      // -------------------
+
+      return styles;
+    };
+
     return (
       <div
         className={`absolute cursor-move select-none hover:ring-1 hover:ring-white/50 transition-all ${
@@ -41,6 +82,7 @@ export const TextLayer = memo(
           backfaceVisibility: "hidden",
           contain: "layout style paint",
           filter: isSelected ? "brightness(1.03)" : "none",
+          ...getEffectStyles(),
         }}
       >
         {element.content}

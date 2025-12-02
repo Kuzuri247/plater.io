@@ -10,6 +10,13 @@ import {
   FlipVertical,
   Scissors,
   RotateCcw,
+  Highlighter,
+  Underline,
+  Strikethrough,
+  Italic,
+  CaseUpper,
+  ALargeSmall,
+  Ghost,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Separator } from "@/components/ui/separator";
 import {
   FONT_FAMILIES,
@@ -33,8 +41,8 @@ import {
   SHADOW_PRESETS,
   LeftPanelProps,
   CLIP_PATHS,
-  TEXT_EFFECTS,
 } from "../../types";
+import { cn } from "@/lib/utils";
 
 export function LeftPanel({
   selectedTextElement,
@@ -90,7 +98,6 @@ export function LeftPanel({
   const activeFontWeight = selectedTextElement?.style.fontWeight ?? fontWeight;
   const activeColor = selectedTextElement?.style.color ?? color;
   const activeTextShadow = selectedTextElement?.style.textShadow ?? textShadow;
-  const activeTextEffect = selectedTextElement?.style.textEffect ?? textEffect;
   const activeTextBorderRadius =
     selectedTextElement?.style.borderRadius ?? textBorderRadius;
   const activeTextBgColor =
@@ -98,6 +105,11 @@ export function LeftPanel({
   const activeTextPadding = selectedTextElement?.style.padding ?? textPadding;
   const activeShowTextBg =
     selectedTextElement?.style.showBackground ?? showTextBackground;
+
+  // Use array fallback
+  const activeTextEffect = selectedTextElement
+    ? selectedTextElement.style.textEffect || []
+    : textEffect || [];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -107,7 +119,6 @@ export function LeftPanel({
   return (
     <div className="flex flex-col h-full w-full">
       <Tabs defaultValue="image" className="w-full flex-1 flex flex-col h-full">
-        {/* Fixed Tabs Header */}
         <div className="px-4 pt-4 shrink-0">
           <TabsList className="w-full grid grid-cols-2 dark:bg-neutral-800">
             <TabsTrigger value="image">
@@ -121,12 +132,12 @@ export function LeftPanel({
           </TabsList>
         </div>
 
-        {/* Scrollable Content Container */}
         <div className="flex-1 min-h-0 relative">
           <TabsContent
             value="image"
             className="absolute inset-0 data-[state=inactive]:hidden focus-visible:outline-none mt-0"
           >
+            {/* Image Panel Content (omitted for brevity, unchanged) */}
             <ScrollArea className="h-full w-full">
               <div className="p-4 flex flex-col gap-6 pb-20">
                 <div className="space-y-5">
@@ -484,7 +495,7 @@ export function LeftPanel({
             <ScrollArea className="h-full w-full">
               <div className="p-4 flex flex-col gap-4 pb-20">
                 <div className="space-y-3">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  <Label className="text-sm font-semibold uppercase tracking-wider">
                     Content
                   </Label>
                   <Textarea
@@ -506,19 +517,24 @@ export function LeftPanel({
                 <Separator />
 
                 <div className="space-y-4">
-                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                  <Label className="text-sm font-semibold uppercase tracking-wider">
                     Typography
                   </Label>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-6 w-fit">
                     <Select
                       value={activeFontFamily}
                       onValueChange={onFontFamilyChange}
                     >
-                      <SelectTrigger className="h-8 bg-transparent border-border/50 font-manrope">
-                        <SelectValue />
+                      <span className="text-[13px] font-medium text-muted-foreground col-start-1 flex items-center">
+                        Family
+                      </span>
+                      <SelectTrigger className="h-8 bg-transparent border-border/50 font-manrope ">
+                        <div className="flex items-center gap-2">
+                          <SelectValue className="" />
+                        </div>
                       </SelectTrigger>
-                      <SelectContent className="font-manrope">
+                      <SelectContent className="font-manrope text-xs">
                         {FONT_FAMILIES.map((f) => (
                           <SelectItem key={f} value={f}>
                             {f}
@@ -531,8 +547,13 @@ export function LeftPanel({
                       value={activeFontWeight}
                       onValueChange={onFontWeightChange}
                     >
+                      <span className="text-[13px] font-medium text-muted-foreground w-fit col-start-4 flex items-center">
+                        Weight
+                      </span>
                       <SelectTrigger className="h-8 bg-transparent border-border/50 font-manrope">
-                        <SelectValue />
+                        <div className="flex items-center gap-2">
+                          <SelectValue />
+                        </div>
                       </SelectTrigger>
                       <SelectContent className="font-manrope">
                         {FONT_WEIGHTS.map((w) => (
@@ -542,21 +563,52 @@ export function LeftPanel({
                         ))}
                       </SelectContent>
                     </Select>
-                    <Select
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium text-muted-foreground">
+                      Text Effects
+                    </Label>
+                    <ToggleGroup
+                      type="multiple"
                       value={activeTextEffect}
-                      onValueChange={onTextEffectChange}
+                      onValueChange={(val) => onTextEffectChange(val)}
+                      className={cn(
+                        "flex-wrap justify-start gap-2 border rounded-md p-1 bg-muted/20",
+                        "*:rounded-md *:transition-colors *:text-muted-foreground *:hover:bg-muted",
+                        " *:size-8 *:data-[state=on]:bg-primary *:data-[state=on]:text-primary-foreground"
+                      )}
                     >
-                      <SelectTrigger className="h-8 bg-transparent border-border/50 font-manrope">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="font-manrope">
-                        {TEXT_EFFECTS.map((e) => (
-                          <SelectItem key={e.value} value={e.value}>
-                            {e.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <ToggleGroupItem value="outline" aria-label="Outline">
+                        <Highlighter className="size-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="underline" aria-label="Underline">
+                        <Underline className="size-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem
+                        value="line-through"
+                        aria-label="Strikethrough"
+                      >
+                        <Strikethrough className="size-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="italic" aria-label="Italic">
+                        <Italic className="size-4" />
+                      </ToggleGroupItem>
+
+                      {/* NEW BUTTONS */}
+                      <ToggleGroupItem value="uppercase" aria-label="Uppercase">
+                        <CaseUpper className="size-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem
+                        value="small-caps"
+                        aria-label="Small Caps"
+                      >
+                        <ALargeSmall className="size-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="blur" aria-label="Blur">
+                        <Ghost className="size-4" />
+                      </ToggleGroupItem>
+                    </ToggleGroup>
                   </div>
 
                   <div className="space-y-3">
@@ -596,7 +648,7 @@ export function LeftPanel({
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-semibold uppercase tracking-wider">
+                    <Label className="text-sm font-semibold uppercase tracking-wider">
                       Background Box
                     </Label>
                     <Switch

@@ -26,6 +26,8 @@ export default function EditorPage() {
     setImageElements,
     textElements,
     setTextElements,
+    isCropping,
+    setIsCropping,
     selectedElementId,
     setSelectedElementId,
     currentText,
@@ -97,6 +99,14 @@ export default function EditorPage() {
     (i) => i.id === selectedElementId
   );
 
+  const handleToggleCropping = () => {
+    setIsCropping(!isCropping);
+  };
+
+  const handleCropChange = (id: string, newCrop: any) => {
+    updateSelectedImage({ crop: newCrop });
+  };
+
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden">
       {/* --- LEFT PANEL --- */}
@@ -155,6 +165,9 @@ export default function EditorPage() {
             onAddText={addTextElement}
             onImageStyleChange={updateSelectedImage}
             onImageUpload={handleImageUpload}
+            isCropping={isCropping}
+            onToggleCropping={handleToggleCropping}
+            onTextStyleChange={updateSelectedText}
             />
           <input
             ref={hiddenInputRef}
@@ -186,6 +199,8 @@ export default function EditorPage() {
               onMouseMove={handleCanvasMouseMove}
               onMouseUp={handleMouseUp}
               isDragging={isDragging}
+              isCropping={isCropping}
+              onCropChange={handleCropChange}
             />
           </div>
         </div>

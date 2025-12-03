@@ -15,46 +15,45 @@ export const TextLayer = memo(
     isDragging: boolean;
     onMouseDown: (e: React.MouseEvent, id: string) => void;
   }) => {
-    // Helper to apply effects
     const getEffectStyles = () => {
-      const effects = element.style.textEffect || [];
-      const baseColor = element.style.color;
-      
-      const styles: React.CSSProperties = {};
+        const effects = element.style.textEffect || [];
+        const baseColor = element.style.color;
+        
+        const styles: React.CSSProperties = {};
+  
+        if (effects.includes("outline")) {
+          styles.color = "transparent";
+          styles.WebkitTextStroke = `1px ${baseColor}`;
+        }
+        
+        const decorations = [];
+        if (effects.includes("underline")) decorations.push("underline");
+        if (effects.includes("line-through")) decorations.push("line-through");
+        
+        if (decorations.length > 0) {
+          styles.textDecoration = decorations.join(" ");
+        }
+  
+        if (effects.includes("italic")) {
+          styles.fontStyle = "italic";
+        }
+  
+        if (effects.includes("uppercase")) {
+          styles.textTransform = "uppercase";
+        }
+  
+        if (effects.includes("small-caps")) {
+          styles.fontVariant = "small-caps";
+        }
+  
+        if (effects.includes("blur")) {
+          styles.filter = "blur(2px)";
+        }
 
-      if (effects.includes("outline")) {
-        styles.color = "transparent";
-        styles.WebkitTextStroke = `1px ${baseColor}`;
-      }
-      
-      const decorations = [];
-      if (effects.includes("underline")) decorations.push("underline");
-      if (effects.includes("line-through")) decorations.push("line-through");
-      
-      if (decorations.length > 0) {
-        styles.textDecoration = decorations.join(" ");
-      }
-
-      if (effects.includes("italic")) {
-        styles.fontStyle = "italic";
-      }
-
-      // --- NEW EFFECTS ---
-      if (effects.includes("uppercase")) {
-        styles.textTransform = "uppercase";
-      }
-
-      if (effects.includes("small-caps")) {
-        styles.fontVariant = "small-caps";
-      }
-
-      if (effects.includes("blur")) {
-        styles.filter = "blur(2px)"; // Adds a soft blur effect
-      }
-      // -------------------
-
-      return styles;
+        return styles;
     };
+
+    const has3DRotation = (element.style.rotateX || 0) !== 0 || (element.style.rotateY || 0) !== 0;
 
     return (
       <div
@@ -67,7 +66,14 @@ export const TextLayer = memo(
           top: element.position.y,
           willChange: isSelected || isDragging ? "transform, left, top" : undefined,
           transformStyle: "preserve-3d",
-          transform: `translateZ(${isSelected ? 30 : 10}px)`,
+          // Update transform to support 3D
+          transform: `
+            perspective(${has3DRotation ? 1000 : 700}px)
+            rotateX(${element.style.rotateX || 0}deg)
+            rotateY(${element.style.rotateY || 0}deg)
+            rotateZ(${element.style.rotate || 0}deg)
+            translateZ(${isSelected ? 30 : 10}px)
+          `,
           fontSize: element.style.fontSize,
           fontFamily: element.style.fontFamily,
           fontWeight: element.style.fontWeight,
@@ -79,7 +85,7 @@ export const TextLayer = memo(
           borderRadius: `${element.style.borderRadius}px`,
           padding: `${element.style.padding}px`,
           lineHeight: 1.2,
-          backfaceVisibility: "hidden",
+          backfaceVisibility: "visible", // Often better for 3D text
           contain: "layout style paint",
           filter: isSelected ? "brightness(1.03)" : "none",
           ...getEffectStyles(),
@@ -89,6 +95,7 @@ export const TextLayer = memo(
       </div>
     );
   },
+  // ... (keep comparison function)
   (prev, next) => {
     return (
       prev.element.id === next.element.id &&

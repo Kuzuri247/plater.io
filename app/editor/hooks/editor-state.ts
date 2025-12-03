@@ -35,7 +35,7 @@ export function useEditorState() {
   const [textBackgroundColor, setTextBackgroundColor] = useState("#000000");
   const [textPadding, setTextPadding] = useState(4);
   const [showTextBackground, setShowTextBackground] = useState(true);
-  
+  const [isCropping, setIsCropping] = useState(false);
   const [textEffect, setTextEffect] = useState<string[]>([]);
 
   const [history, setHistory] = useState<HistoryState[]>([
@@ -112,6 +112,9 @@ export function useEditorState() {
         padding: textPadding,
         showBackground: showTextBackground,
         textEffect,
+        rotate: 0,
+        rotateX: 0,
+        rotateY: 0,
       },
     };
     setTextElements((prev) => [...prev, newElement]);
@@ -271,6 +274,10 @@ export function useEditorState() {
     setCanvasBackground(val);
     queueHistorySave();
   };
+  const handleSetSelectedElementId = (id: string | null) => {
+    setSelectedElementId(id);
+    setIsCropping(false);
+  };
 
   return {
     aspectRatioName,
@@ -281,8 +288,10 @@ export function useEditorState() {
     setImageElements,
     textElements,
     setTextElements,
+    isCropping,
+    setIsCropping,
     selectedElementId,
-    setSelectedElementId,
+    setSelectedElementId: handleSetSelectedElementId,
     currentText,
     fontSize,
     fontFamily,

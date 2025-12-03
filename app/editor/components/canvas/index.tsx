@@ -19,6 +19,8 @@ interface EditorCanvasProps {
   onMouseMove: (e: React.MouseEvent) => void;
   onMouseUp: () => void;
   isDragging: boolean;
+  isCropping: boolean;
+  onCropChange: (id: string, newCrop: any) => void;
 }
 
 export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
@@ -35,6 +37,8 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
       onMouseMove,
       onMouseUp,
       isDragging,
+      isCropping,
+      onCropChange,
     },
     ref
   ) => {
@@ -72,16 +76,18 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
             </div>
           )}
 
-          {imageElements.map((img) => (
+         {imageElements.map((img) => (
             <ImageLayer
               key={img.id}
               img={img}
               isSelected={selectedElement === img.id}
               isDragging={isDragging && selectedElement === img.id}
               onMouseDown={onElementMouseDown}
+              // Pass new props
+              isCropping={isCropping && selectedElement === img.id}
+              onCropChange={onCropChange}
             />
           ))}
-
           {textElements.map((element) => (
             <TextLayer
               key={element.id}

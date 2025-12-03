@@ -6,8 +6,6 @@ import {
   Plus,
   BoxSelect,
   Rotate3d,
-  FlipHorizontal,
-  FlipVertical,
   Scissors,
   RotateCcw,
   Highlighter,
@@ -17,6 +15,7 @@ import {
   CaseUpper,
   ALargeSmall,
   Ghost,
+  Crop,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,6 +71,9 @@ export function LeftPanel({
   onAddText,
   onImageStyleChange,
   onImageUpload,
+  isCropping,
+  onToggleCropping,
+  onTextStyleChange,
 }: LeftPanelProps) {
   const imgStyle = selectedImageElement?.style || {
     scale: 100,
@@ -92,6 +94,10 @@ export function LeftPanel({
   const resetCrop = () =>
     onImageStyleChange({ crop: { top: 0, right: 0, bottom: 0, left: 0 } });
 
+  const textRotate = selectedTextElement?.style.rotate || 0;
+  const textRotateX = selectedTextElement?.style.rotateX || 0;
+  const textRotateY = selectedTextElement?.style.rotateY || 0;
+
   const activeText = selectedTextElement?.content ?? currentText;
   const activeFontSize = selectedTextElement?.style.fontSize ?? fontSize;
   const activeFontFamily = selectedTextElement?.style.fontFamily ?? fontFamily;
@@ -105,8 +111,6 @@ export function LeftPanel({
   const activeTextPadding = selectedTextElement?.style.padding ?? textPadding;
   const activeShowTextBg =
     selectedTextElement?.style.showBackground ?? showTextBackground;
-
-  // Use array fallback
   const activeTextEffect = selectedTextElement
     ? selectedTextElement.style.textEffect || []
     : textEffect || [];
@@ -375,89 +379,8 @@ export function LeftPanel({
                         </div>
 
                         {/* Flip & Crop */}
-                        <div className="space-y-4">
-                          <div className="space-y-3 pt-2 font-manrope">
-                            <div className="flex items-center justify-between">
-                              <Label className="text-xs font-medium flex items-center gap-2">
-                                <Scissors className="size-3" /> Manual Crop (%)
-                              </Label>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-5 w-5"
-                                onClick={resetCrop}
-                                title="Reset Crop"
-                              >
-                                <RotateCcw className="size-3" />
-                              </Button>
-                            </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                              <div className="space-y-1.5">
-                                <Label className="text-[10px] text-muted-foreground">
-                                  Top
-                                </Label>
-                                <Slider
-                                  value={[imgStyle.crop.top]}
-                                  onValueChange={([v]) =>
-                                    onImageStyleChange({
-                                      crop: { ...imgStyle.crop, top: v },
-                                    })
-                                  }
-                                  max={100}
-                                />
-                              </div>
-                              <div className="space-y-1.5">
-                                <Label className="text-[10px] text-muted-foreground">
-                                  Right
-                                </Label>
-                                <Slider
-                                  value={[imgStyle.crop.right]}
-                                  onValueChange={([v]) =>
-                                    onImageStyleChange({
-                                      crop: { ...imgStyle.crop, right: v },
-                                    })
-                                  }
-                                  max={100}
-                                />
-                              </div>
-                              <div className="space-y-1.5">
-                                <Label className="text-[10px] text-muted-foreground">
-                                  Bottom
-                                </Label>
-                                <Slider
-                                  value={[imgStyle.crop.bottom]}
-                                  onValueChange={([v]) =>
-                                    onImageStyleChange({
-                                      crop: { ...imgStyle.crop, bottom: v },
-                                    })
-                                  }
-                                  max={100}
-                                />
-                              </div>
-                              <div className="space-y-1.5">
-                                <Label className="text-[10px] text-muted-foreground">
-                                  Left
-                                </Label>
-                                <Slider
-                                  value={[imgStyle.crop.left]}
-                                  onValueChange={([v]) =>
-                                    onImageStyleChange({
-                                      crop: { ...imgStyle.crop, left: v },
-                                    })
-                                  }
-                                  max={100}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Clipping Controls */}
-                        <div className="space-y-2 font-manrope pt-2">
-                          <Label className="text-xs font-medium flex items-center gap-2 font-manrope">
-                            <BoxSelect className="size-3" /> Shape Clip
-                          </Label>
+                        <div className="space-y-4 grid grid-cols-2 gap-12">
                           <Select
                             value={imgStyle.clipPath}
                             onValueChange={(val) =>
@@ -465,6 +388,7 @@ export function LeftPanel({
                             }
                           >
                             <SelectTrigger className="h-8 bg-transparent border-border/50 ">
+                              Clip Path
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent className="">
@@ -475,6 +399,26 @@ export function LeftPanel({
                               ))}
                             </SelectContent>
                           </Select>
+
+                          <div className="space-y-3 font-manrope">
+                            <div className="flex items-center justify-between">
+                              <Button
+                                variant={isCropping ? "default" : "outline"}
+                                size="sm"
+                                onClick={onToggleCropping}
+                                className="h-8.5 rounded-xs text-xs flex items-center"
+                              >
+                                <Crop className="w-3 h-3 mr-1.5" />
+                                {isCropping ? "Done" : "Crop"}
+                              </Button>
+                            </div>
+
+                            {isCropping && (
+                              <p className="text-[10px] text-muted-foreground">
+                                Drag the handles on the image to crop.
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </>
@@ -639,6 +583,59 @@ export function LeftPanel({
                         min={12}
                         max={80}
                         className="flex-1"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <Label className="text-sm font-semibold uppercase tracking-wider">
+                    3D Transforms
+                  </Label>
+                  <div className="space-y-2 font-manrope">
+                    <div className="grid grid-cols-3 items-center gap-2">
+                      <Label className="text-[10px] text-muted-foreground">
+                        X: {textRotateX}°
+                      </Label>
+                      <Label className="text-[10px] text-muted-foreground">
+                        Y: {textRotateY}°
+                      </Label>
+                      <Label className="text-[10px] text-muted-foreground">
+                        Z: {textRotate}°
+                      </Label>
+                    </div>
+                    <div className="flex gap-2">
+                      <Slider
+                        value={[textRotateX]}
+                        onValueChange={([val]) =>
+                          onTextStyleChange({ rotateX: val })
+                        }
+                        min={-180}
+                        max={180}
+                        step={1}
+                        className="py-1"
+                      />
+                      <Slider
+                        value={[textRotateY]}
+                        onValueChange={([val]) =>
+                          onTextStyleChange({ rotateY: val })
+                        }
+                        min={-180}
+                        max={180}
+                        step={1}
+                        className="py-1"
+                      />
+                      <Slider
+                        value={[textRotate]}
+                        onValueChange={([val]) =>
+                          onTextStyleChange({ rotate: val })
+                        }
+                        min={-180}
+                        max={180}
+                        step={1}
+                        className="py-1"
                       />
                     </div>
                   </div>

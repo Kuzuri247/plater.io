@@ -19,7 +19,6 @@ export interface ImageStyle {
   };
 }
 
-// New Interface for Image Layers
 export interface ImageElement {
   id: string;
   src: string;
@@ -37,7 +36,10 @@ export interface TextStyle {
   backgroundColor: string;
   padding: number;
   showBackground: boolean;
-  textEffect: string[]; 
+  textEffect: string[];
+  rotate: number;
+  rotateX: number;
+  rotateY: number;
 }
 
 export interface TextElement {
@@ -62,7 +64,7 @@ export interface LeftPanelProps {
   textBackgroundColor: string;
   textPadding: number;
   showTextBackground: boolean;
-  textEffect: string[]; // Changed to array
+  textEffect: string[];
 
   // Handlers
   onTextChange: (value: string) => void;
@@ -75,11 +77,13 @@ export interface LeftPanelProps {
   onTextBackgroundColorChange: (value: string) => void;
   onTextPaddingChange: (value: number) => void;
   onShowTextBackgroundChange: (value: boolean) => void;
-  onTextEffectChange: (value: string[]) => void; // Changed to array
+  onTextEffectChange: (value: string[]) => void;
   onAddText: () => void;
-
   onImageStyleChange: (updates: Partial<ImageStyle>) => void;
   onImageUpload: (file: File) => void;
+  isCropping: boolean;
+  onToggleCropping: () => void;
+  onTextStyleChange: (updates: Partial<TextStyle>) => void;
 }
 
 
@@ -116,8 +120,8 @@ export const TEXT_EFFECTS = [
   { name: "Underline", value: "underline" },
   { name: "Strikethrough", value: "line-through" },
   { name: "Italic", value: "italic" },
-  { name: "Uppercase", value: "uppercase" },   // Added
-  { name: "Small Caps", value: "small-caps" }, // Added
+  { name: "Uppercase", value: "uppercase" },
+  { name: "Small Caps", value: "small-caps" },
   { name: "Blur", value: "blur" },
 ];
 

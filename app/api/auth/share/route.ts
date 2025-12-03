@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth"; 
+import { auth, prisma } from "@/lib/auth"; 
 import { headers } from "next/headers";
 
 export async function POST(req: Request) {
@@ -16,10 +16,8 @@ export async function POST(req: Request) {
   const twitterAccount = accounts.find(a => a.providerId === "twitter");
   const linkedinAccount = accounts.find(a => a.providerId === "linkedin");
 
-
   if (twitterAccount) {
      const accessToken = twitterAccount.accessToken;
-
   }
 
   return NextResponse.json({ success: true });

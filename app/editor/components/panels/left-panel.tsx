@@ -75,7 +75,6 @@ export function LeftPanel({
   onToggleCropping,
   onTextStyleChange,
 }: LeftPanelProps) {
-  
   const imgStyle = selectedImageElement?.style || {
     scale: 100,
     opacity: 100,
@@ -181,7 +180,7 @@ export function LeftPanel({
                       <Label className="text-sm font-semibold uppercase tracking-wider">
                         Properties
                       </Label>
-                      <div className="space-y-4 grid grid-cols-2 gap-2 font-manrope font-semibold">
+                      <div className="space-y-4 grid grid-cols-2 gap-2 px-2 font-manrope font-semibold *:pr-1">
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <Label className="text-xs font-medium text-muted-foreground">
@@ -327,12 +326,12 @@ export function LeftPanel({
                         <div className="space-y-3 font-manrope">
                           <div className="flex items-center justify-between">
                             <Label className="text-xs font-medium flex items-center gap-2">
-                              <Rotate3d className="w-3 h-3" /> 3D Rotation
+                              <Rotate3d className="size-3" /> 3D Rotation
                             </Label>
                           </div>
 
                           <div className="space-y-2 pt-2">
-                            <div className="grid grid-cols-3 items-center gap-2">
+                            <div className="flex justify-around px-2 items-center gap-2">
                               <Label className="text-[10px] text-muted-foreground">
                                 X: {imgStyle.rotateX}°
                               </Label>
@@ -344,7 +343,7 @@ export function LeftPanel({
                               </Label>
                             </div>
 
-                            <div className="flex gap-2">
+                            <div className="flex gap-4 px-2">
                               <Slider
                                 value={[imgStyle.rotateX]}
                                 onValueChange={([val]) =>
@@ -380,43 +379,52 @@ export function LeftPanel({
                         </div>
 
                         {/* Flip & Crop */}
+                        <div className="grid grid-cols-3 relative">
+                          <div className="flex col-span-2 items-center justify-normal gap-3">
+                            <Select
+                              value={imgStyle.clipPath}
+                              onValueChange={(val) =>
+                                onImageStyleChange({ clipPath: val })
+                              }
+                            >
+                              <span className="text-xs font-medium text-muted-foreground flex justify-center items-center">
+                                <Scissors className="size-3 mr-1.5" />
+                                Clip Path
+                              </span>
+                              <SelectTrigger className="h-8 bg-transparent border-border/50 ">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {CLIP_PATHS.map((clip) => (
+                                  <SelectItem
+                                    key={clip.name}
+                                    value={clip.value}
+                                  >
+                                    {clip.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
 
-                        <div className="space-y-4 grid grid-cols-2 gap-12">
-                          <Select
-                            value={imgStyle.clipPath}
-                            onValueChange={(val) =>
-                              onImageStyleChange({ clipPath: val })
-                            }
-                          >
-                            <SelectTrigger className="h-8 bg-transparent border-border/50 ">
-                              Clip Path
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="">
-                              {CLIP_PATHS.map((clip) => (
-                                <SelectItem key={clip.name} value={clip.value}>
-                                  {clip.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-
-                          <div className="space-y-3 font-manrope">
-                            <div className="flex items-center justify-between">
-                              <Button
-                                variant={isCropping ? "default" : "outline"}
-                                size="sm"
+                          <div className="relative col-span-1 text-muted-foreground">
+                            <div className="flex items-center justify-end">
+                              <button
                                 onClick={onToggleCropping}
-                                className="h-8.5 rounded-xs text-xs flex items-center"
+                                className={`h-8.5 w-22 mr-2 rounded-xs text-xs flex items-center justify-center border-2 transition-colors ${
+                                  isCropping
+                                    ? "bg-primary dark:bg-primary/90 text-primary-foreground border-dashed border-3 border-black"
+                                    : "bg-transparent text-muted-foreground border-dashed border-neutral-300 dark:border-neutral-700"
+                                }`}
                               >
-                                <Crop className="w-3 h-3 mr-1.5" />
+                                <Crop className="size-3 mr-1.5" />
                                 {isCropping ? "Done" : "Crop"}
-                              </Button>
+                              </button>
                             </div>
 
                             {isCropping && (
-                              <p className="text-[10px] text-muted-foreground">
-                                Drag the handles on the image to crop.
+                              <p className="absolute left-0 mt-1 text-[11px] text-muted-foreground font-inter">
+                                Once done click the button again
                               </p>
                             )}
                           </div>

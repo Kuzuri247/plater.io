@@ -1,27 +1,53 @@
 "use client";
 
-import React, { memo, useRef, useState, useEffect } from "react";
+import React, { memo, useRef } from "react";
 import { ImageElement } from "../../types";
-import { Move } from "lucide-react";
+
+type CropPosition = "top" | "right" | "bottom" | "left" | "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
 // Helper for crop handles
 const CropHandle = ({ 
   position, 
   onMouseDown 
 }: { 
-  position: "top" | "right" | "bottom" | "left", 
+  position: CropPosition, 
   onMouseDown: (e: React.MouseEvent) => void 
 }) => {
-  const isVertical = position === "left" || position === "right";
+  let cursorClass = "";
+  let positionClass = "";
+  
+  const baseClass = "absolute z-50 flex items-center justify-center pointer-events-auto";
+  
+  if (position === "top") {
+    cursorClass = "cursor-ns-resize";
+    positionClass = "top-0 left-0 right-0 h-1.5 -translate-y-1/2";
+  } else if (position === "bottom") {
+    cursorClass = "cursor-ns-resize";
+    positionClass = "bottom-0 left-0 right-0 h-1.5 translate-y-1/2";
+  } else if (position === "left") {
+    cursorClass = "cursor-ew-resize";
+    positionClass = "left-0 top-0 bottom-0 w-1.5 -translate-x-1/2";
+  } else if (position === "right") {
+    cursorClass = "cursor-ew-resize";
+    positionClass = "right-0 top-0 bottom-0 w-1.5 translate-x-1/2";
+  } else if (position === "top-left") {
+    cursorClass = "cursor-nwse-resize";
+    positionClass = "top-0 left-0 w-3 h-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white";
+  } else if (position === "top-right") {
+    cursorClass = "cursor-nesw-resize";
+    positionClass = "top-0 right-0 w-3 h-3 translate-x-1/2 -translate-y-1/2 rounded-full border border-white";
+  } else if (position === "bottom-left") {
+    cursorClass = "cursor-nesw-resize";
+    positionClass = "bottom-0 left-0 w-3 h-3 -translate-x-1/2 translate-y-1/2 rounded-full border border-white";
+  } else if (position === "bottom-right") {
+    cursorClass = "cursor-nwse-resize";
+    positionClass = "bottom-0 right-0 w-3 h-3 translate-x-1/2 translate-y-1/2 rounded-full border border-white";
+  }
+
   return (
     <div
       onMouseDown={(e) => { e.stopPropagation(); onMouseDown(e); }}
-      className={`absolute z-50 flex items-center justify-center
-        ${position === "top" ? "top-0 left-0 right-0 h-1.5 cursor-ns-resize" : ""}
-        ${position === "bottom" ? "bottom-0 left-0 right-0 h-1.5 cursor-ns-resize" : ""}
-        ${position === "left" ? "left-0 top-0 bottom-0 w-1.5 cursor-ew-resize" : ""}
-        ${position === "right" ? "right-0 top-0 bottom-0 w-1.5 cursor-ew-resize" : ""}
-      `}
+      className={`${baseClass} ${positionClass} ${cursorClass}`}
     />
   );
 };
@@ -43,37 +69,40 @@ export const ImageLayer = memo(
     onCropChange: (id: string, newCrop: { top: number; right: number; bottom: number; left: number }) => void;
   }) => {
     const layerRef = useRef<HTMLDivElement>(null);
+    const ghostRef = useRef<HTMLImageElement>(null);
     
-    // Logic for dragging crop handles
-    const handleCropStart = (e: React.MouseEvent, side: "top" | "right" | "bottom" | "left") => {
+    const handleCropStart = (e: React.MouseEvent, side: CropPosition) => {
       e.preventDefault();
+      e.stopPropagation();
+      
       const startX = e.clientX;
       const startY = e.clientY;
       const startCrop = { ...img.style.crop };
       
-      // Get element dimensions to calculate percentage
-      const rect = layerRef.current?.getBoundingClientRect();
+      const rect = ghostRef.current?.getBoundingClientRect();
       if (!rect) return;
 
       const handleMove = (moveEvent: MouseEvent) => {
-        if (!rect) return;
         const deltaX = moveEvent.clientX - startX;
         const deltaY = moveEvent.clientY - startY;
-        
-        // Simple approximation: calculating delta percentage based on screen size of element
-        // Note: For rotated elements, this simple logic might feel inverted depending on rotation.
-        // A full implementation requires projecting vectors. 
-        // This implementation works best for unrotated images or slight rotations.
         
         const deltaPctX = (deltaX / rect.width) * 100;
         const deltaPctY = (deltaY / rect.height) * 100;
 
         const newCrop = { ...startCrop };
 
-        if (side === "top") newCrop.top = Math.min(Math.max(0, startCrop.top + deltaPctY), 100 - newCrop.bottom - 10);
-        if (side === "bottom") newCrop.bottom = Math.min(Math.max(0, startCrop.bottom - deltaPctY), 100 - newCrop.top - 10);
-        if (side === "left") newCrop.left = Math.min(Math.max(0, startCrop.left + deltaPctX), 100 - newCrop.right - 10);
-        if (side === "right") newCrop.right = Math.min(Math.max(0, startCrop.right - deltaPctX), 100 - newCrop.left - 10);
+        if (side.includes("left")) {
+          newCrop.left = Math.min(Math.max(0, startCrop.left + deltaPctX), 100 - newCrop.right - 5);
+        }
+        if (side.includes("right")) {
+          newCrop.right = Math.min(Math.max(0, startCrop.right - deltaPctX), 100 - newCrop.left - 5);
+        }
+        if (side.includes("top")) {
+          newCrop.top = Math.min(Math.max(0, startCrop.top + deltaPctY), 100 - newCrop.bottom - 5);
+        }
+        if (side.includes("bottom")) {
+          newCrop.bottom = Math.min(Math.max(0, startCrop.bottom - deltaPctY), 100 - newCrop.top - 5);
+        }
 
         onCropChange(img.id, newCrop);
       };
@@ -87,31 +116,17 @@ export const ImageLayer = memo(
       document.addEventListener("mouseup", handleUp);
     };
 
-    const hasCrop =
-      img.style.crop.top > 0 ||
-      img.style.crop.right > 0 ||
-      img.style.crop.bottom > 0 ||
-      img.style.crop.left > 0;
-    const hasShapeClip = img.style.clipPath !== "none";
-
-    let clipStyle = undefined;
-    if (hasShapeClip) {
-      clipStyle = img.style.clipPath;
-    } else if (hasCrop) {
-      clipStyle = `inset(${img.style.crop.top}% ${img.style.crop.right}% ${img.style.crop.bottom}% ${img.style.crop.left}%)`;
-    }
-
     const has3DRotation = img.style.rotateX !== 0 || img.style.rotateY !== 0;
+
+    const { top, right, bottom, left } = img.style.crop;    
+
+    const widthFactor = 100 / Math.max(1, 100 - left - right);
+    const heightFactor = 100 / Math.max(1, 100 - top - bottom);
 
     return (
       <div
         ref={layerRef}
-        className={`absolute cursor-move transition-transform ${
-          isDragging ? "duration-0" : "duration-100"
-        } ease-out hover:ring-1 hover:ring-white/30 ${
-          isSelected && !isCropping ? "ring-2 ring-primary z-20" : "z-10"
-        } ${isCropping ? "z-50 ring-1 ring-dashed ring-primary/50" : ""}`}
-        onMouseDown={(e) => !isCropping && onMouseDown(e, img.id)}
+        className={`absolute transition-transform ${isDragging ? "duration-0" : "duration-100"} ease-out`}
         style={{
           left: img.position.x,
           top: img.position.y,
@@ -127,67 +142,82 @@ export const ImageLayer = memo(
             scaleY(${img.style.flipY ? -1 : 1})
             translateZ(${isSelected ? 20 : 0}px)
           `,
-          borderRadius: `${img.style.borderRadius}px`,
-          boxShadow: img.style.shadow === "none" ? "none" : img.style.shadow,
-          opacity: img.style.opacity / 100,
-          filter: `blur(${img.style.blur}px) ${isSelected ? "brightness(1.03)" : ""}`,
-          clipPath: clipStyle,
-          backfaceVisibility: has3DRotation ? "visible" : "hidden",
-          contain: "layout style paint",
+          pointerEvents: "none",
         }}
       >
-        {/* Render Crop Handles if in cropping mode */}
-        {isCropping && isSelected && (
-          <>
-            <div className="absolute inset-0 border-4 border-dashed border-primary pointer-events-none" 
-                 style={{ 
-                   top: `${img.style.crop.top}%`, 
-                   bottom: `${img.style.crop.bottom}%`, 
-                   left: `${img.style.crop.left}%`, 
-                   right: `${img.style.crop.right}%` 
-                 }} 
-            />
-            {/* We place handles on the edge of the bounding box, but they affect the inner clip */}
-            <CropHandle position="top" onMouseDown={(e) => handleCropStart(e, "top")} />
-            <CropHandle position="bottom" onMouseDown={(e) => handleCropStart(e, "bottom")} />
-            <CropHandle position="left" onMouseDown={(e) => handleCropStart(e, "left")} />
-            <CropHandle position="right" onMouseDown={(e) => handleCropStart(e, "right")} />
-            
-            {/* Visual Guide */}
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/75 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap pointer-events-none">
-              Drag edges to crop
-            </div>
-          </>
-        )}
-
-        {/* noise */}
-        {img.style.noise > 0 && (
-          <div
-            className="absolute inset-0 z-10 pointer-events-none rounded-[inherit] mix-blend-overlay"
-            style={{
-              opacity: img.style.noise / 100,
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='4' seed='15' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-              backgroundRepeat: "repeat",
-              contain: "strict",
-            }}
-          />
-        )}
-
         <img
+          ref={ghostRef}
           src={img.src}
-          alt="Layer"
+          alt=""
+          className="opacity-0 pointer-events-none block"
+          style={{ maxWidth: "none" }}
           draggable={false}
-          loading="lazy"
-          className="block object-contain pointer-events-none"
-          style={{
-            borderRadius: `${img.style.borderRadius}px`,
-            maxWidth: "none",
-            maxHeight: "none",
-            // We apply crop on the container div usually, but if using inset on image directly:
-            // clipPath: clipStyle, 
-            // In this specific architecture, clipping the parent div is usually safer for transforms
-          }}
         />
+
+        <div
+          className={`absolute pointer-events-auto cursor-move
+            ${isSelected && !isCropping ? "ring-2 ring-primary z-20" : "z-10"} 
+            ${isCropping ? "z-50 ring-1 ring-dashed ring-primary/50" : ""}
+          `}
+          onMouseDown={(e) => !isCropping && onMouseDown(e, img.id)}
+          style={{
+             inset: `${top}% ${right}% ${bottom}% ${left}%`,
+             borderRadius: `${img.style.borderRadius}px`,
+             boxShadow: img.style.shadow === "none" ? "none" : img.style.shadow,
+             opacity: img.style.opacity / 100,
+             filter: `blur(${img.style.blur}px) ${isSelected ? "brightness(1.03)" : ""}`,
+             backfaceVisibility: has3DRotation ? "visible" : "hidden",
+          }}
+        >
+            <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
+                <img
+                    src={img.src}
+                    alt="Layer"
+                    draggable={false}
+                    className="block object-contain pointer-events-none max-w-none max-h-none absolute"
+                    style={{
+                        width: `${widthFactor * 100}%`,
+                        height: `${heightFactor * 100}%`,
+                        left: `${-left * widthFactor}%`,
+                        top: `${-top * heightFactor}%`,
+                    }}
+                />
+
+                {/* noise  */}
+                {img.style.noise > 0 && (
+                    <div
+                        className="absolute inset-0 z-10 pointer-events-none mix-blend-overlay"
+                        style={{
+                            opacity: img.style.noise / 100,
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='4' seed='15' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                            backgroundRepeat: "repeat",
+                        }}
+                    />
+                )}
+            </div>
+
+            {isCropping && isSelected && (
+            <>
+                <div className="absolute inset-0 border-dashed border-4 border-primary pointer-events-none" />
+                
+                {/* Edge Handles */}
+                <CropHandle position="top" onMouseDown={(e) => handleCropStart(e, "top")} />
+                <CropHandle position="bottom" onMouseDown={(e) => handleCropStart(e, "bottom")} />
+                <CropHandle position="left" onMouseDown={(e) => handleCropStart(e, "left")} />
+                <CropHandle position="right" onMouseDown={(e) => handleCropStart(e, "right")} />
+                
+                {/* Corner Handles */}
+                <CropHandle position="top-left" onMouseDown={(e) => handleCropStart(e, "top-left")} />
+                <CropHandle position="top-right" onMouseDown={(e) => handleCropStart(e, "top-right")} />
+                <CropHandle position="bottom-left" onMouseDown={(e) => handleCropStart(e, "bottom-left")} />
+                <CropHandle position="bottom-right" onMouseDown={(e) => handleCropStart(e, "bottom-right")} />
+                
+                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/75 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap pointer-events-none backdrop-blur-sm z-50">
+                   Drag edges or corners to crop
+                </div>
+            </>
+            )}
+        </div>
       </div>
     );
   },

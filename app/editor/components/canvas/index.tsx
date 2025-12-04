@@ -47,7 +47,7 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
     }, [onEmptyClick]);
 
     return (
-      <Card className="p-0 bg-transparent border-none shadow-none overflow-visible relative group/canvas">
+      <Card className="p-0 bg-white border-none shadow-none overflow-visible relative group/canvas">
         <div
           ref={ref}
           className="relative overflow-hidden transition-all duration-300 ease-in-out flex items-center justify-center select-none"
@@ -83,7 +83,6 @@ export const Canvas = forwardRef<HTMLDivElement, EditorCanvasProps>(
               isSelected={selectedElement === img.id}
               isDragging={isDragging && selectedElement === img.id}
               onMouseDown={onElementMouseDown}
-              // Pass new props
               isCropping={isCropping && selectedElement === img.id}
               onCropChange={onCropChange}
             />

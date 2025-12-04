@@ -4,7 +4,14 @@ import { useRef } from "react";
 import { Canvas } from "./components/canvas";
 import { LeftPanel } from "./components/panels/left-panel";
 import { RightPanel } from "./components/panels/right-panel";
-import { ArrowLeft, Twitter, Undo2, Redo2, RotateCcw } from "lucide-react";
+import {
+  ArrowLeft,
+  Twitter,
+  Undo2,
+  Redo2,
+  RotateCcw,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -44,6 +51,7 @@ export default function EditorPage() {
     history,
     historyIndex,
     resetCanvas,
+    deleteSelectedElement,
     addTextElement,
     updateSelectedText,
     handleImageUpload,
@@ -226,7 +234,16 @@ export default function EditorPage() {
             >
               <Redo2 />
             </Button>
-            <div className="w-px h-4 bg-border mx-1" />
+            <div className="w-px h-6 bg-neutral-400 dark:bg-neutral-700 mx-1" />
+            <Button
+              onClick={deleteSelectedElement}
+              disabled={!selectedElementId}
+              variant="ghost"
+              size="icon"
+              className="rounded-full w-8 h-8 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-muted-foreground hover:text-destructive"
+            >
+              <Trash2 size={18} />
+            </Button>
             <Button
               onClick={resetCanvas}
               variant="ghost"

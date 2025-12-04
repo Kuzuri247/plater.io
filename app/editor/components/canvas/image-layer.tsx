@@ -16,7 +16,7 @@ const CropHandle = ({
   return (
     <div
       onMouseDown={(e) => { e.stopPropagation(); onMouseDown(e); }}
-      className={`absolute bg-primary/80 hover:bg-primary z-50 flex items-center justify-center
+      className={`absolute z-50 flex items-center justify-center
         ${position === "top" ? "top-0 left-0 right-0 h-1.5 cursor-ns-resize" : ""}
         ${position === "bottom" ? "bottom-0 left-0 right-0 h-1.5 cursor-ns-resize" : ""}
         ${position === "left" ? "left-0 top-0 bottom-0 w-1.5 cursor-ew-resize" : ""}
@@ -139,7 +139,7 @@ export const ImageLayer = memo(
         {/* Render Crop Handles if in cropping mode */}
         {isCropping && isSelected && (
           <>
-            <div className="absolute inset-0 border-2 border-primary pointer-events-none" 
+            <div className="absolute inset-0 border-4 border-dashed border-primary pointer-events-none" 
                  style={{ 
                    top: `${img.style.crop.top}%`, 
                    bottom: `${img.style.crop.bottom}%`, 

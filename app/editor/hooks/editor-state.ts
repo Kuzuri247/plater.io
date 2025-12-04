@@ -87,6 +87,20 @@ export function useEditorState() {
     toast.success("Canvas reset!");
   };
 
+  const deleteSelectedElement = () => {
+    if (!selectedElementId) return;
+
+    if (selectedElementId.startsWith("text")) {
+      setTextElements((prev) => prev.filter((el) => el.id !== selectedElementId));
+    } else {
+      setImageElements((prev) => prev.filter((el) => el.id !== selectedElementId));
+    }
+    setSelectedElementId(null);
+    setIsCropping(false);
+    saveHistoryImmediate();
+    toast.success("Layer deleted");
+  };
+
   const addTextElement = () => {
     const newElement: TextElement = {
       id: `text_${Date.now()}`,
@@ -301,6 +315,7 @@ export function useEditorState() {
     history,
     historyIndex,
     resetCanvas,
+    deleteSelectedElement,
     addTextElement,
     updateSelectedText,
     handleImageUpload,

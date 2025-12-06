@@ -2,11 +2,6 @@
 
 import { Download, LayoutTemplate, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  ButtonGroup,
-  ButtonGroupText,
-  ButtonGroupSeparator,
-} from "@/components/ui/button-group"; // Make sure to import these if you have them, otherwise standard flex
 
 import { Label } from "@/components/ui/label";
 import {
@@ -40,7 +35,7 @@ export function RightPanel({
           <span className="text-foreground">Canvas Size</span>
         </div>
         <Select value={aspectRatio} onValueChange={onAspectRatioChange}>
-          <SelectTrigger className="h-10 w-full bg-background/50 font-manrope">
+          <SelectTrigger data-size="md" className="h-14 py-2 h-lg w-full bg-background/50 font-manrope">
             <SelectValue placeholder="Select Size" />
           </SelectTrigger>
           <SelectContent className="font-manrope">
@@ -96,34 +91,46 @@ export function RightPanel({
           </ScrollArea>
         </div>
       </div>
-
-      {/* 3. Fixed Footer: Export Settings */}
       <div className="space-y-4 p-5 border-t border-border shrink-0 bg-card z-10">
-        <div className="space-y-3">
-          <Label className="text-xs font-medium text-muted-foreground">
-            Export Format
-          </Label>
-          <div className="grid grid-cols-2 gap-3">
-            <Select value={exportFormat} onValueChange={onExportFormatChange}>
-              <SelectTrigger className="h-8 bg-transparent font-manrope">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="png">PNG</SelectItem>
-                <SelectItem value="jpeg">JPG</SelectItem>
-                <SelectItem value="svg">SVG</SelectItem>
-              </SelectContent>
-            </Select>
-            {/* <Select value={exportQuality} onValueChange={onExportQualityChange}>
-              <SelectTrigger className="h-8 bg-transparent font-manrope">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1x</SelectItem>
-                <SelectItem value="2">2x</SelectItem>
-                <SelectItem value="4">4x</SelectItem>
-              </SelectContent>
-            </Select> */}
+        {/* export  */}
+        <Label className="text-sm font-medium">Export Settings</Label>
+        <div className="flex flex-row justify-between mx-2 items-center">
+          <div className="flex flex-row space-y-3 gap-4">
+            <Label className="text-[13px] font-medium text-muted-foreground pt-2">
+              Format
+            </Label>
+            <div className="flex gap-3">
+              <Select value={exportFormat} onValueChange={onExportFormatChange}>
+                <SelectTrigger className="h-8 bg-transparent font-manrope">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="png">PNG</SelectItem>
+                  <SelectItem value="jpeg">JPG</SelectItem>
+                  <SelectItem value="svg">SVG</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex flex-row space-y-3 gap-4">
+            <Label className="text-[13px] font-medium text-muted-foreground pt-2">
+              Quality
+            </Label>
+            <div className="flex gap-3">
+              <Select
+                value={exportQuality}
+                onValueChange={onExportQualityChange}
+              >
+                <SelectTrigger className="h-8 bg-transparent font-manrope">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1x</SelectItem>
+                  <SelectItem value="2">2x</SelectItem>
+                  <SelectItem value="4">4x</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 

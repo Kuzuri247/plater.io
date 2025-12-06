@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter, Manrope } from "next/font/google";
 import "./globals.css";
-import { Provider } from "@/components/provider";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next"
+import { Provider } from "@/components/provider";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -44,6 +45,7 @@ export default function RootLayout({
           {children}
         </main>
         <Toaster position="top-center" swipeDirections={["right"]} />
+        <Analytics />
         {/* </Provider> */}
       </body>
     </html>

@@ -6,8 +6,34 @@ import { Footer } from "@/components/footer";
 import { Pricing } from "@/components/pricing";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ReactLenis } from "lenis/react";
+import { authClient } from "@/auth-client";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Lock, LogIn, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 function App() {
+  const router = useRouter();
+
+  const { data: session, isPending } = authClient.useSession();
+
+  const handleLogin = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/preview",
+    });
+  };
+  
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/"); // Redirect to home
+        },
+      },
+    });
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground transition-colors duration-300 flex flex-col gap-16 md:gap-32">
       <ReactLenis root />
@@ -17,32 +43,64 @@ function App() {
             Pla<span className="text-primary">tor</span>
           </div>
           <div className="hidden md:flex gap-8 text-xs font-medium text-muted-foreground uppercase tracking-widest">
-            <a href="/" className="hover:text-foreground transition-colors">
-              Features
+            <a
+              href="/editor"
+              className="hover:text-foreground transition-colors"
+            >
+              Editor
             </a>
-            <a href="#" className="hover:text-foreground transition-colors">
-              Pricing
+            <a
+              href="/preview"
+              className="hover:text-foreground transition-colors"
+            >
+              Preview
             </a>
-            <a href="#" className="hover:text-foreground transition-colors">
-              Showcase
+            <a
+              href="/scheduler"
+              className="hover:text-foreground transition-colors"
+            >
+              Scheduler
             </a>
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <button className="bg-foreground text-background hover:bg-muted-foreground hover:text-white px-5 py-2 text-xs font-bold uppercase tracking-wide transition-colors rounded-none">
-              Log In
-            </button>
+            {!session && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogin}
+                className="gap-2 border-primary/50 text-primary hover:bg-primary/10"
+              >
+                <LogIn size={12} /> Login
+              </Button>
+            )}
+
+            {session && (
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                size="sm"
+                className="gap-2 border-primary/50 text-primary hover:bg-primary/10"
+              >
+                <LogOut size={12} /> Logout
+              </Button>
+            )}
           </div>
         </div>
       </nav>
 
       <Hero />
 
-      <div className="relative z-20 bg-background border-t border-b transition-colors duration-300">
+      <div
+        id="features"
+        className="relative z-20 bg-background border-t border-b transition-colors duration-300"
+      >
         <BentoGrid />
       </div>
 
-      <Pricing />
+      <div id="pricing">
+        <Pricing />
+      </div>
 
       <Footer />
     </main>

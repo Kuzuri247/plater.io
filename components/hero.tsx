@@ -35,7 +35,7 @@ export const Hero = () => {
                 transition={{ duration: 0.6 }}
                 className="inline-block mb-6 px-3 py-1 border border-border text-muted-foreground text-xs uppercase tracking-widest bg-background/50 backdrop-blur-sm"
               >
-                v1.0 Launch Soon
+                v1.0 Released
               </motion.div>
 
               <motion.h1
@@ -68,6 +68,7 @@ export const Hero = () => {
                   size="md"
                   variant="primary"
                   className="bg-primary/80 hover:bg-primary hover:scale-103 transition-transform duration-300 ease-in-out"
+                  onClick={() => (window.location.href = "/editor")}
                 >
                   Start Creating Free
                 </Button>

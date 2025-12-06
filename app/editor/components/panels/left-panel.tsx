@@ -391,7 +391,7 @@ export function LeftPanel({
                                 <Scissors className="size-3 mr-1.5" />
                                 Clip Path
                               </span>
-                              <SelectTrigger className="h-8 bg-transparent border-border/50 ">
+                              <SelectTrigger className="h-8 bg-transparent ">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>

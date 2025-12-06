@@ -1,8 +1,9 @@
 "use client";
 
-import { Wifi } from "lucide-react";
+import { Battery, Wifi } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { XPost, LinkedInPost, InstagramPost } from "@/components/posts";
+import { LeftSidebarSkeleton, RightSidebarSkeleton } from "./skeletons";
 
 export type Platform = "twitter" | "linkedin" | "instagram";
 export type PreviewMode = "mobile" | "desktop";
@@ -14,39 +15,11 @@ interface PlayerProps {
   previewMode: PreviewMode;
 }
 
-// Skeleton Components for Desktop View
-const LeftSidebarSkeleton = () => (
-  <div className="hidden lg:flex flex-col gap-4 w-64 shrink-0 p-4">
-    <div className="h-8 w-8 rounded-full bg-muted/50 mb-4" />
-    <div className="space-y-4">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="flex items-center gap-3">
-          <div className="h-6 w-6 rounded-full bg-muted/40" />
-          <div className="h-4 w-24 rounded bg-muted/30" />
-        </div>
-      ))}
-    </div>
-    <div className="mt-auto h-12 w-full rounded-full bg-primary/10" />
-  </div>
-);
+<>
+  <LeftSidebarSkeleton />
 
-const RightSidebarSkeleton = () => (
-  <div className="hidden xl:flex flex-col gap-4 w-72 shrink-0 p-4 pl-8">
-    <div className="h-10 w-full rounded-full bg-muted/30 mb-2" />
-    <div className="rounded-xl bg-muted/20 p-4 space-y-4">
-      <div className="h-4 w-1/3 rounded bg-muted/40" />
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="space-y-2">
-          <div className="flex justify-between">
-            <div className="h-3 w-1/4 rounded bg-muted/30" />
-            <div className="h-3 w-3 rounded bg-muted/30" />
-          </div>
-          <div className="h-4 w-3/4 rounded bg-muted/40" />
-        </div>
-      ))}
-    </div>
-  </div>
-);
+  <RightSidebarSkeleton />
+</>;
 
 export function Player({
   imageSrc,
@@ -85,10 +58,8 @@ export function Player({
 
   return (
     <div className="w-full h-full flex items-center justify-center relative p-4">
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(#ababab_1px,transparent_1px)] bg-size-[20px_20px] opacity-20 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(#ababab_1.5px,transparent_2px)] bg-size-[20px_20px] opacity-20 pointer-events-none" />
 
-      {/* Device Frame */}
       <div
         className={cn(
           "bg-background border-4 border-neutral-800 dark:border-neutral-700 shadow-2xl flex flex-col overflow-hidden relative transition-all duration-300 ease-in-out",
@@ -97,31 +68,36 @@ export function Player({
             : "w-full max-w-[1200px] h-[85vh] rounded-xl border-2"
         )}
       >
-        {/* Device Status Bar / Header */}
-        <div className="h-7 border-b border-border bg-muted/50 flex items-center px-4 gap-2 relative z-10 justify-between shrink-0">
-          <div className="flex gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
-          </div>
+        <div className="h-8 border-b border-border bg-muted/50 flex px-4 gap-2 relative z-10 justify-center items-center shrink-0">
           {previewMode === "mobile" && (
-            <div className="flex items-center gap-2">
-              <Wifi size={12} className="text-muted-foreground" />
-              <span className="text-[10px] font-mono text-muted-foreground">
-                100%
-              </span>
-            </div>
+            <>
+              <div className="flex-1" />
+              <div className="flex gap-2 ml-auto  pt-2">
+                <Wifi size={12} className="text-muted-foreground" />
+                <Battery size={12} className="text-muted-foreground" />
+                <span className="text-[10px] font-mono text-muted-foreground mr-2">
+                  100%
+                </span>
+              </div>
+            </>
           )}
           {previewMode === "desktop" && (
-            <div className="flex-1 text-center">
-              <div className="w-1/3 h-4 bg-muted/50 mx-auto rounded-md text-[10px] flex items-center justify-center text-muted-foreground">
-                plator.com
+            <>
+              <div className="flex gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
               </div>
-            </div>
+              <div className="flex-1 text-center">
+                <div className="w-1/3 h-4 bg-muted/50 mx-auto rounded-md text-[10px] flex items-center justify-center text-muted-foreground">
+                  plator.com
+                </div>
+              </div>
+            </>
           )}
         </div>
 
-        <div className="flex-1 bg-background relative overflow-y-auto scrollbar-hide">
+        <div className="flex-1 bg-background relative overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {previewMode === "desktop" ? (
             <div className="flex justify-center h-full">
               <LeftSidebarSkeleton />

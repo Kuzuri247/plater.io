@@ -4,11 +4,13 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
-  CalendarClock,
   Smartphone,
   Monitor,
   Upload,
-  Settings,
+  Send,
+  Check,
+  Lock,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Player, Platform, PreviewMode } from "./components/player";
@@ -16,11 +18,21 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { authClient } from "@/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function PreviewPage() {
+  const router = useRouter();
+
+  const { data: session, isPending } = authClient.useSession();
+
   const [caption, setCaption] = useState("");
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [platform, setPlatform] = useState<Platform>("twitter");
+
+  const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([
+    "twitter",
+    "linkedin",
+  ]);
   const [previewMode, setPreviewMode] = useState<PreviewMode>("mobile");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -45,11 +57,87 @@ export default function PreviewPage() {
     }
   };
 
+  const togglePlatform = (p: Platform) => {
+    setSelectedPlatforms((prev) =>
+      prev.includes(p) ? prev.filter((item) => item !== p) : [...prev, p]
+    );
+  };
+
+  const downloadImage = () => {
+    if (!imageSrc) return;
+    const link = document.createElement("a");
+    link.href = imageSrc;
+    link.download = "plator-post.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.info("Image downloaded! You can now drag it into the open tabs.");
+  };
+
+  const handlePost = async () => {
+    if (!session) {
+      toast.error("You must be logged in to post.");
+      return;
+    }
+
+    if (selectedPlatforms.length === 0) {
+      toast.error("Select at least one platform");
+      return;
+    }
+
+    downloadImage();
+
+    selectedPlatforms.forEach((p) => {
+      let url = "";
+      const text = encodeURIComponent(caption);
+
+      if (p === "twitter") {
+        url = `https://twitter.com/intent/tweet?text=${text}`;
+      } else if (p === "linkedin") {
+        url = `https://www.linkedin.com/feed/?shareActive=true&text=${text}`;
+      } else if (p === "instagram") {
+        toast.info(
+          "Instagram does not support 1-click web posting. Use your mobile device."
+        );
+        return;
+      }
+
+      if (url) {
+        // Open in new tab
+        window.open(url, "_blank");
+      }
+    });
+  };
+
+  const handleLogin = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/preview",
+    });
+  };
+
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/"); // Redirect to home
+        },
+      },
+    });
+  };
+
   const platforms: { id: Platform; label: string }[] = [
     { id: "twitter", label: "Twitter" },
     { id: "linkedin", label: "LinkedIn" },
-    { id: "instagram", label: "Instagram" },
   ];
+
+  if (isPending) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background text-foreground">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen max-h-screen bg-background flex flex-col overflow-hidden">
@@ -63,44 +151,48 @@ export default function PreviewPage() {
           </Link>
           <div className="flex flex-col">
             <span className="text-sm font-bold font-display uppercase tracking-wide">
-              Preview & Schedule
+              Preview & Post
             </span>
-            <span className="text-xs text-muted-foreground font-mono">
-              Ready to Publish
+            <span className="text-xs text-muted-foreground font-inter">
+              Finalize Content
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
+          {!session && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogin}
+              className="gap-2 border-primary/50 text-primary hover:bg-primary/10"
+            >
+              <Lock size={12} /> Login with Google
+            </Button>
+          )}
+
+          {session && (
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              size="sm"
+              className="gap-2 border-primary/50 text-primary hover:bg-primary/10"
+            >
+              <LogOut size={12} /> Logout
+            </Button>
+          )}
+
           <ThemeToggle />
-          <div className="w-px h-4 bg-border mx-1" />
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="hidden sm:flex h-8 text-xs"
-          >
-            <Settings size={14} className="mr-2" />
-            Settings
-          </Button>
-
-          <Button variant="primary" size="sm" className="h-8 text-xs font-bold">
-            <CalendarClock size={14} className="mr-2" />
-            Schedule Post
-          </Button>
         </div>
       </header>
 
       <main className="flex-1 flex flex-col lg:flex-row min-h-0">
-        {/* Left Side: Settings & Toggle */}
+        {/* Left Side: Settings */}
         <div className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-border bg-card/30 flex flex-col z-20">
-          {/* Header of Left Panel with Toggle */}
           <div className="p-4 border-b border-border flex items-center justify-between">
             <h2 className="text-sm font-bold uppercase text-muted-foreground ml-2">
-              Post Details
+              Configuration
             </h2>
-
-            {/* View Toggle */}
             <div className="flex bg-muted p-0.5 rounded-lg border border-border">
               <button
                 onClick={() => setPreviewMode("mobile")}
@@ -110,7 +202,6 @@ export default function PreviewPage() {
                     ? "bg-background text-primary shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 )}
-                title="Mobile View"
               >
                 <Smartphone size={14} />
               </button>
@@ -122,7 +213,6 @@ export default function PreviewPage() {
                     ? "bg-background text-primary shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 )}
-                title="Desktop View"
               >
                 <Monitor size={14} />
               </button>
@@ -132,29 +222,34 @@ export default function PreviewPage() {
           <div className="p-6 flex-1 overflow-y-auto space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Platforms</label>
+                <label className="text-sm font-medium">Select Platforms</label>
                 <div className="flex gap-2 flex-wrap mt-1">
-                  {platforms.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => setPlatform(p.id)}
-                      className={cn(
-                        "px-3 py-1.5 border rounded text-xs transition-colors flex-1 text-center font-manrope",
-                        platform === p.id
-                          ? "bg-primary text-primary-foreground border-primary font-bold shadow-sm"
-                          : "bg-background hover:border-primary text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      {p.label}
-                    </button>
-                  ))}
+                  {platforms.map((p) => {
+                    const isSelected = selectedPlatforms.includes(p.id);
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => togglePlatform(p.id)}
+                        className={cn(
+                          "px-3 py-2 border rounded-md text-[13px] transition-all flex-1 text-center font-manrope flex items-center justify-center gap-2",
+                          isSelected
+                            ? "bg-primary/10 border-primary text-primary font-bold shadow-sm"
+                            : "bg-background hover:bg-muted text-muted-foreground"
+                        )}
+                      >
+                        {isSelected && <Check size={12} />}
+                        {p.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
+
               <div className="space-y-2">
-                <label className="text-sm font-medium">Post Image</label>
+                <label className="text-sm font-medium">Media</label>
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className=" mt-1 w-full h-24 border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-primary/5 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all group"
+                  className="mt-1 w-full h-32 border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-primary/5 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all group overflow-hidden relative"
                 >
                   <input
                     ref={fileInputRef}
@@ -163,35 +258,58 @@ export default function PreviewPage() {
                     className="hidden"
                     onChange={handleImageUpload}
                   />
-                  <Upload
-                    size={20}
-                    className="text-muted-foreground mb-2 group-hover:text-primary transition-colors"
-                  />
-                  <span className="text-[10px] text-muted-foreground font-medium">
-                    {imageSrc ? "Add Image" : "Upload Generated Image"}
-                  </span>
+                  {imageSrc ? (
+                    <img
+                      src={imageSrc}
+                      className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
+                    />
+                  ) : (
+                    <>
+                      <Upload
+                        size={24}
+                        className="text-muted-foreground mb-2 group-hover:text-primary transition-colors"
+                      />
+                      <span className="text-xs text-muted-foreground font-medium">
+                        Click to Upload
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium ">Caption</label>
+                <label className="text-sm font-medium">Caption</label>
                 <Textarea
-                  className=" mt-1 w-full font-manrope min-h-[120px] bg-background border rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                  placeholder="Write your caption here..."
+                  className="mt-1 w-full font-manrope border-neutral-300 dark:border-neutral-700 min-h-[150px] bg-background border rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                  placeholder="What's on your mind?"
                   value={caption}
                   onChange={(e) => setCaption(e.target.value)}
                 />
+              </div>
+              <div className="flex items-center justify-center">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="h-8 text-xs font-bold "
+                  onClick={handlePost}
+                  disabled={!session}
+                >
+                  <Send size={14} className="mr-2" />
+                  Post Now
+                </Button>
               </div>
             </div>
           </div>
         </div>
 
         {/* Center: Preview Player */}
-        <div className="flex-1 bg-muted/10 relative overflow-hidden flex items-center justify-center">
+        <div className="flex-1 bg-muted/10 relative overflow-hidden flex items-center justify-center p-4 lg:p-0">
           <Player
             imageSrc={imageSrc}
             caption={caption}
-            platform={platform}
+            platform={
+              selectedPlatforms[selectedPlatforms.length - 1] || "twitter"
+            }
             previewMode={previewMode}
           />
         </div>
